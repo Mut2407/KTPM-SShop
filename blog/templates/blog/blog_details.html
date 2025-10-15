@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <article class="bg-white p-5 rounded-4 shadow-lg">
+        <h1 class="fw-bold text-dark mb-4" style="font-size: 2.5rem;">{{ post.title }}</h1>
+
+        {% if post.image %}
+          <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded mb-4" style="max-height: 500px; object-fit: cover;">
+        {% endif %}
+
+        <div class="text-muted mb-3" style="font-size: 1rem;">
+          🕒 Đăng ngày {{ post.created_at|date:"d/m/Y H:i" }}
+        </div>
+
+        <div class="fs-5 lh-lg" style="color: #333; font-size: 1.2rem;">
+          {{ post.content|linebreaks }}
+        </div>
+
+        <div class="mt-4">
+          <a href="{% url 'blog:blog' %}" class="btn btn-outline-secondary">← Quay lại Blog</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+{% endblock %}
