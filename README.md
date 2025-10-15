@@ -2,10 +2,7 @@
 
 Trang web bán đồ thể thao
 
-#Chức năng chính của web
-
-<br>
-
+# Chức năng chính của web
 <I>User
 
 1. Đăng nhập / Đăng ký
