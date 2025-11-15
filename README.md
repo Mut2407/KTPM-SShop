@@ -1,73 +1,91 @@
-# KTPM-SShop
+# Ecommerce Website (Django/javascript)
 
-Trang web bán đồ thể thao
+![Django Ecommerce Store](https://github.com/omarreda22/Django-eCommerce-Store/blob/main/core/static/img/e_shop.PNG)
 
-# Chức năng chính của web
-<I>User
+Full-featured shopping cart with PayPal & credit/debit payments
 
-1. Đăng nhập / Đăng ký
-2. Tìm kiếm
-3. Thêm sản phẩm vào giỏ hàng
-4. Thanh toán (Checkout)
-5. Xem đơn hàng
-6. Đánh giá sản phẩm
+Product rating & review system
 
-<II>Superuser - Admin
-1. Quản lý sản phẩm (Shop)
-2. Quản lý đơn hàng
-3. Quản lý người dùng
-4. Quản lý đánh giá
-5. Quản lý giỏ hàng
+An actual real-world project built in a linear and progressive manner
 
-# Run the project
+Admin area to manage customers, products & orders
 
-1. clone this repo
+Product search, carousel, pagination & more
 
-```bash
-git clone <this_repo>
-```
 
+## View Full Video Demo On [Youtube](https://www.youtube.com/watch?v=lwWEabH0-lY)
+
+<br>
+
+
+## How to install on Windows
+1. clone this project
 2. install virtualenv
-
-```bash
+```
 pip install virtualenv
 ```
-
 3. create new virtual environment
-
-```bash
+```
 py -m venv venv
 ```
-
 4. activate the new virtual
-
-```bash
+```
 .\venv\Scripts\activate
 ```
-
 5. install requirements.txt
-
-```bash
+```
 pip install -r requirements.txt
 ```
-
 6. run local server to begin
-
-```bash
-py manage.py runserver
-```
-
-7.  go live with [localhost:8000](http://localhost:8000/)
-
+ ```
+ py manage.py runserver
+ ```
+ 7. go live with [localhost:8000](http://localhost:8000/)
+ 
+ ### To install on Unix/macOS  [see this document](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments)
+ 
+ 
  <br>
+ 
+ 
+ 
+ ## To add new products and access admin panel 
+ 1. run on trimnal 
+ ```
+ py manage.py createsuperuser
+ ```
+ 2. create new admin user
+ 2. go to [localhost:8000/admin](http://localhost:8000/admin)
 
-# To login with superuser and access admin panel
 
-1.  run on terminal
+## Some of feature in this store
 
-```bash
-py manage.py createsuperuser
-```
+- Full-featured shopping cart
+- Review and Rating System
+- Top products carousel
+- Product pagination
+- Product search feature
+- User profile with orders
+- Admin product management
+- Admin Order details page
+- Mark orders as a delivered option
+- Checkout process (shipping, payment method, etc... )
+- PayPal / Credit Card integration
+- Category Filter
+- Addition of variable products    
+- Post on your blog
+- Contact page
+- Professional and modern website design with matching colors
+- An unlimited number of products and categories
+- Unlimited pages 
+- Easy to manage the site
 
-2.  create new admin user
-3.  go to [localhost:8000/admin](http://localhost:8000/admin)
+
+
+### Need help? Found a bug? Message me!
+
+
+
+<br>
+
+### Enjoy^^

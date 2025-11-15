@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\KYVY\KTPM-SShop\venv"
+VIRTUAL_ENV="C:\DownLoad\BaiTap.exe\Chuyên Nghành IT\Kiểm thử phần mềm\DeTaiKTPM\Django-eCommerce-Store\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
