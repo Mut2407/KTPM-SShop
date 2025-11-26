@@ -26,7 +26,7 @@ pip install virtualenv
 ```
 3. create new virtual environment
 ```
-py -m venv venv
+python -m venv venv
 ```
 4. activate the new virtual
 ```
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 ```
 6. run local server to begin
  ```
- py manage.py runserver
+ python manage.py runserver
  ```
  7. go live with [localhost:8000](http://localhost:8000/)
  
