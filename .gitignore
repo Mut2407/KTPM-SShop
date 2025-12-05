@@ -1,1 +1,51 @@
+# --- Python & Django Core ---
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.log
+local_settings.py
+
+# --- Database ---
+db.sqlite3
+db.sqlite3-journal
+
+# --- Environment & Security ---
 .env
+.env.*
+.venv
+env/
+venv/
+ENV/
+
+# --- Media & Static ---
+media/
+staticfiles/
+
+# --- Testing & Coverage ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# --- IDE & Editor ---
+# VS Code
+.vscode/
+# PyCharm
+.idea/
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Khác ---
+dist/
+build/
+*.egg-info/
