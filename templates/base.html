@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{% block title %}E - S H O P{% endblock title %}</title>
+    <title>{% block title %}S - S H O P{% endblock title %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- favicon -->
@@ -112,21 +112,20 @@
                                 <li>
                                     <a style="color:#f4cca4" href="#"><i class="mdi mdi-settings"></i></a>
                                     <ul style="background:#1c1427">
-                                        <li><a href="my-account.html">My account</a></li>
-                                        <li><a href="cart.html">My cart</a></li>
-                                        <li><a href="wishlist.html">My wishlist</a></li>
-                                        <li><a href="checkout.html">Check out</a></li>
+                                        <li><a href="{% url 'accounts:dashboard' %}">My account</a></li>
+                                        <li><a href="{% url 'cart:cart' %}">My cart</a></li>
+                                        <li><a href="{% url 'orders:checkout' %}">Checkout</a></li>
+
                                     </ul>
                                 </li>
                             </ul>
-                            <!--
+                            {% comment %}                             
                             <div class="right floatright">
-                               
-                                     <form action="{% url 'shop:search' %}" method="GET" >
+                                <form action="{% url 'shop:search' %}" method="GET" >
                                     <button style="color:#d99879" type="submit"><i class="mdi mdi-magnify"></i></button>
                                     <input type="text" placeholder="Search..." name="keyword"/>
                                     </form>
-                            -->
+                             {% endcomment %}
                             </div>
                         </div>
                     </div>
@@ -152,7 +151,7 @@
                 <div class="col-sm-2">
                     <div class="logo">
                         <a style="color:#f4cca4;font-weight: 800;" href="\"><span
-                                style="color:#d99879">E-</span>shop</a>
+                                style="color:#d99879">S-</span>Shop</a>
                     </div>
                 </div>
                 <div class="col-sm-8">
@@ -170,9 +169,12 @@
                                             {% endfor %}
                                         </ul>
                                     </li>
-                                    <li><a href="blog.html">Blog</a></li>
-                                    <li><a href="about.html">About</a></li>
-                                    <li><a href="contact.html">Contact</a></li>
+                                    <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'blog:blog' %}">Blog</a></li>
+                                    <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'about' %}">About</a></li>
+                                    <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
                                 </ul>
                             </nav>
                         </div>
@@ -191,9 +193,12 @@
                                                 {% endfor %}
                                             </ul>
                                         </li>
-                                        <li><a style="color:#1c1427" href="blog.html">Blog</a></li>
-                                        <li><a style="color:#1c1427" href="about.html">About</a></li>
-                                        <li><a style="color:#1c1427" href="contact.html">Contact</a></li>
+                                        <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'blog:blog' %}">Blog</a></li>
+                                        <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'about' %}">About</a></li>
+                                        <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -254,7 +259,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-6">
-                        <p style="color:#d99879">Created By <span style="color:#f4cca4"><b>Omar Reda</b></span> 2021 &
+                        <p style="color:#d99879">Created By <span style="color:#f4cca4"><b>ktpm-sgu25</b></span> 2025 &
                             All Rights Reserved.</p>
                     </div>
                     <div class="col-xs-12 col-sm-6 text-right">
