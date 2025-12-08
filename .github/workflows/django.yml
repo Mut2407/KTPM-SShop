@@ -49,7 +49,7 @@ jobs:
         run: python manage.py test orders
 
       - name: Test Blog App
-        run: python manage.py test blogp
+        run: python manage.py test blog
 
 
   # --- JOB 2: CD (Build & Push Docker) ---
