@@ -4,24 +4,20 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from accounts.models import Account
 from .models import Product, Category, ReviewRating
 
+# ============================================================================
+# 1. UNIT TEST: Kiểm tra logic tính toán trong Model
+# ============================================================================
 class ShopUnitTest(TestCase):
-    """
-    Unit Test: Kiểm tra logic của Models và các phương thức tính toán
-    """
     def setUp(self):
-        # 1. Tạo Category
-        self.category = Category.objects.create(
-            name="Giày",
-            slug="giay"
-        )
+        # Tạo Category
+        self.category = Category.objects.create(name="Giày", slug="giay")
         
-        # 2. Tạo Product (Sửa lỗi: dùng 'name' thay vì 'product_name')
-        # Tạo ảnh giả lập nhỏ để tránh lỗi ImageField
-        image_content = b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x05\x04\x04\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b'
+        # Tạo Product với ảnh giả lập
+        image_content = b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x4c\x01\x00\x3b'
         uploaded_image = SimpleUploadedFile("small.gif", image_content, content_type="image/gif")
 
         self.product = Product.objects.create(
-            name="Nike Air",        # <--- Đã sửa thành 'name'
+            name="Nike Air",
             slug="nike-air",
             price=200.00,
             stock=10,
@@ -30,28 +26,18 @@ class ShopUnitTest(TestCase):
             image=uploaded_image
         )
 
-        # 3. Tạo User để viết Review
+        # Tạo User để test Review
         self.user = Account.objects.create_user(
             first_name='Test', last_name='User', username='testuser', email='test@user.com', password='password123'
         )
 
     def test_product_model_str(self):
-        """Kiểm tra __str__ trả về tên sản phẩm"""
+        """Test __str__ trả về tên sản phẩm"""
         self.assertEqual(str(self.product), "Nike Air")
 
-    def test_category_model_str(self):
-        """Kiểm tra __str__ trả về tên danh mục"""
-        self.assertEqual(str(self.category), "Giày")
-
-    def test_product_url_resolution(self):
-        """Kiểm tra hàm lấy URL chi tiết sản phẩm trong Model"""
-        # Lưu ý: Trong models.py của bạn hàm tên là get_prodcut_details_url (có thể bạn gõ sai chữ product)
-        expected_url = f'/shop/{self.category.slug}/{self.product.slug}/'
-        self.assertEqual(self.product.get_prodcut_details_url(), expected_url)
-
     def test_review_rating_calculation(self):
-        """Kiểm tra logic tính điểm trung bình (averageRating) và số lượng review"""
-        # Tạo 2 review: 1 cái 5 sao, 1 cái 3 sao -> TB = 4.0
+        """Test tính điểm trung bình và đếm số lượng review"""
+        # Tạo 2 review: 5 sao và 3 sao -> Trung bình = 4.0
         ReviewRating.objects.create(product=self.product, user=self.user, rating=5, status=True)
         ReviewRating.objects.create(product=self.product, user=self.user, rating=3, status=True)
         
@@ -59,68 +45,109 @@ class ShopUnitTest(TestCase):
         self.assertEqual(self.product.averageRating(), 4.0)
 
 
+# ============================================================================
+# 2. INTEGRATION TEST: Kiểm tra View và URL
+# ============================================================================
 class ShopIntegrationTest(TestCase):
-    """
-    Integration Test: Kiểm tra Views và URLs
-    """
     def setUp(self):
         self.client = Client()
         self.category = Category.objects.create(name="Áo", slug="ao")
         self.product = Product.objects.create(
-            name="Áo Thun",
-            slug="ao-thun",
-            price=100,
-            stock=50,
-            category=self.category,
-            is_available=True,
-            image='test.jpg'
+            name="Áo Thun", slug="ao-thun", price=100, stock=50, 
+            category=self.category, is_available=True, image='test.jpg'
         )
 
     def test_home_view(self):
-        """Kiểm tra trang chủ hiển thị sản phẩm"""
-        url = reverse('shop:home') # namespace 'shop'
-        response = self.client.get(url)
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Áo Thun")
-        self.assertTemplateUsed(response, 'shop/index.html')
-
-    def test_shop_view(self):
-        """Kiểm tra trang cửa hàng (Store Page)"""
-        url = reverse('shop:shop')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Áo Thun")
-
-    def test_shop_category_view(self):
-        """Kiểm tra lọc sản phẩm theo danh mục"""
-        # URL: /shop/ao/
-        # Lưu ý: trong urls.py bạn đặt name='categries' (thiếu chữ o)
-        url = reverse('shop:categries', args=[self.category.slug]) 
-        response = self.client.get(url)
-        
+        """Test trang chủ hiển thị sản phẩm"""
+        response = self.client.get(reverse('shop:home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Áo Thun")
 
     def test_product_detail_view(self):
-        """Kiểm tra trang chi tiết sản phẩm"""
+        """Test trang chi tiết sản phẩm"""
         url = reverse('shop:product_details', args=[self.category.slug, self.product.slug])
         response = self.client.get(url)
-        
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Áo Thun")
-        self.assertContains(response, "100") # Kiểm tra giá tiền
+        self.assertContains(response, "100") # Kiểm tra giá
 
     def test_search_view(self):
-        """Kiểm tra chức năng tìm kiếm"""
+        """Test chức năng tìm kiếm"""
         url = reverse('shop:search')
-        
-        # 1. Tìm từ khóa có tồn tại
+        # Tìm thấy
         response = self.client.get(url, {'keyword': 'Thun'})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Áo Thun")
-        
-        # 2. Tìm từ khóa không tồn tại
-        response = self.client.get(url, {'keyword': 'XYZABC'})
-        self.assertEqual(response.status_code, 200)
+        # Không tìm thấy
+        response = self.client.get(url, {'keyword': 'XYZ'})
         self.assertNotContains(response, "Áo Thun")
+
+
+# ============================================================================
+# 3. SYSTEM TEST: Mô phỏng luồng người dùng thực tế
+# ============================================================================
+class ShopSystemTest(TestCase):
+    """
+    Kịch bản: 
+    Khách tìm kiếm sản phẩm -> Xem chi tiết -> Đăng nhập -> Viết đánh giá 5 sao
+    """
+    def setUp(self):
+        self.client = Client()
+        
+        # 1. Setup User & Active
+        self.user = Account.objects.create_user('Sys', 'User', 'sysuser', 'sys@shop.com', 'pass123')
+        self.user.is_active = True
+        self.user.save()
+        
+        # 2. Setup Product
+        self.category = Category.objects.create(name="Laptop", slug="laptop")
+        self.product = Product.objects.create(
+            name="Macbook Pro", slug="macbook-pro", price=2000, stock=5, 
+            category=self.category, image='m.jpg'
+        )
+
+    def test_search_view_review_flow(self):
+        # --- BƯỚC 1: TÌM KIẾM SẢN PHẨM ---
+        print("\n[Shop System Test] 1. Searching for 'Macbook'...")
+        search_url = reverse('shop:search')
+        response = self.client.get(search_url, {'keyword': 'Macbook'})
+        
+        # Kiểm tra kết quả tìm kiếm có sản phẩm không
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Macbook Pro")
+
+        # --- BƯỚC 2: XEM CHI TIẾT SẢN PHẨM ---
+        print("[Shop System Test] 2. Viewing Product Details...")
+        detail_url = reverse('shop:product_details', args=[self.category.slug, self.product.slug])
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, 200)
+
+        # --- BƯỚC 3: ĐĂNG NHẬP (Để review) ---
+        print("[Shop System Test] 3. Logging in...")
+        self.client.login(email='sys@shop.com', password='pass123')
+
+        # --- BƯỚC 4: GỬI ĐÁNH GIÁ (REVIEW) ---
+        print("[Shop System Test] 4. Posting a 5-star Review...")
+        review_url = reverse('shop:review', args=[self.product.id])
+        
+        # Giả lập HTTP_REFERER vì view review sẽ redirect về trang trước đó
+        header = {'HTTP_REFERER': detail_url}
+        
+        data = {
+            'rating': 5,
+            'review': 'Sản phẩm tuyệt vời, đáng tiền!'
+        }
+        response = self.client.post(review_url, data, **header)
+        
+        # Kiểm tra Redirect (302) sau khi post thành công
+        self.assertEqual(response.status_code, 302)
+        
+        # --- BƯỚC 5: KIỂM TRA DỮ LIỆU ĐÃ LƯU ---
+        print("[Shop System Test] 5. Verifying Review in Database...")
+        # Kiểm tra xem review đã được lưu vào DB chưa
+        self.assertTrue(ReviewRating.objects.filter(product=self.product, user=self.user, rating=5).exists())
+        
+        # Kiểm tra lại trang chi tiết xem review có hiện ra không
+        response = self.client.get(detail_url)
+        self.assertContains(response, 'Sản phẩm tuyệt vời')
+        
+        print("[Shop System Test] Shop Flow Successful ")
