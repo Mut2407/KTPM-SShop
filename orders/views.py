@@ -22,6 +22,24 @@ from shop.models import Product
 from urllib.parse import urlencode
 from django.conf import settings
 
+
+def _validate_cart_stock_or_redirect(request, cart_items):
+    """Ensure all cart items have available stock. Redirects with messages on failure.
+    Returns None when ok, or a redirect response when invalid.
+    """
+    insufficient = []
+    for item in cart_items:
+        if item.product.stock == 0 or item.quantity > item.product.stock:
+            insufficient.append((item.product, item.product.stock))
+    if insufficient:
+        for product, stock in insufficient:
+            if stock == 0:
+                messages.error(request, f'{product.name} đã hết hàng. Vui lòng xóa khỏi giỏ để tiếp tục.')
+            else:
+                messages.error(request, f'{product.name}: chỉ còn {stock} sản phẩm. Vui lòng điều chỉnh số lượng.')
+        return redirect('cart:cart')
+    return None
+
 @login_required(login_url='accounts:login')
 def payment_method(request):
     cart_items = CartItem.objects.filter(user=request.user)
@@ -29,6 +47,11 @@ def payment_method(request):
     if not cart_items.exists():
         messages.error(request, "Giỏ hàng trống.")
         return redirect("cart:cart")
+
+    # Validate stock before choosing payment method
+    resp = _validate_cart_stock_or_redirect(request, cart_items)
+    if resp:
+        return resp
 
     if request.method == "POST":
         method = request.POST.get("payment_method")
@@ -86,6 +109,11 @@ def checkout(request,total=0, total_price=0, quantity=0, cart_items=None):
 
     # ----------XỬ LÝ POST THANH TOÁN ----------
     if request.method == "POST":
+        # Validate stock before creating order
+        ci = CartItem.objects.filter(user=request.user) if request.user.is_authenticated else cart_items
+        resp = _validate_cart_stock_or_redirect(request, ci)
+        if resp:
+            return resp
         # Tạo order trước khi chuyển đến VNPAY Fake
         order = Order.objects.create(
             user = request.user if request.user.is_authenticated else None,
@@ -183,6 +211,12 @@ def payments(request):
     body = json.loads(request.body)
     order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
     
+    # Validate stock before capturing payment and creating order products
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+        if item.product.stock == 0 or item.quantity > item.product.stock:
+            return JsonResponse({'error': 'Sản phẩm hết hàng hoặc không đủ số lượng.'}, status=400)
+
     # Store transation details inside payment model 
     payment = Payment(
         user = request.user,
@@ -221,7 +255,8 @@ def payments(request):
         
         # Reduce the quantity of the sold products
         product = Product.objects.get(id=item.product_id)
-        product.stock -= item.quantity
+        # Reduce the quantity of the sold products safely
+        product.stock = max(0, product.stock - item.quantity)
         product.save()
 
     # Clear Cart 
@@ -334,6 +369,13 @@ def vnpay_return(request):
 
     # Code 00 = Thanh toán thành công
     if response_code == "00":
+        # Validate stock again before finalizing
+        cart_items = CartItem.objects.filter(user=request.user)
+        resp = _validate_cart_stock_or_redirect(request, cart_items)
+        if resp:
+            order.status = "FAILED"
+            order.save()
+            return resp
 
         # ---- ĐÁNH DẤU ĐƠN HÀNG ĐÃ MUA ----
         order.status = "PAID"
@@ -354,7 +396,7 @@ def vnpay_return(request):
 
             # Giảm kho sản phẩm
             product = item.product
-            product.stock -= item.quantity
+            product.stock = max(0, product.stock - item.quantity)
             product.save()
 
         # Xóa giỏ hàng sau khi đặt hàng
@@ -369,6 +411,12 @@ def vnpay_return(request):
 
 def complete_cod_payment(request, order):
     cart_items = CartItem.objects.filter(user=request.user)
+
+    resp = _validate_cart_stock_or_redirect(request, cart_items)
+    if resp:
+        order.status = "FAILED"
+        order.save()
+        return resp
 
     payment = Payment.objects.create(
         user=request.user,

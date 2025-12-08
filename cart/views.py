@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import Cart, CartItem
 from shop.models import Product
@@ -21,6 +22,10 @@ def add_cart(request, product_id):
     current_user = request.user
     product = Product.objects.get(id=product_id) # get the product
     product_variation = []
+    # Block adding when out of stock
+    if product.stock == 0:
+        messages.error(request, 'Sản phẩm đã hết hàng. Không thể thêm vào giỏ.')
+        return redirect(request.META.get('HTTP_REFERER', 'shop:shop'))
     if current_user.is_authenticated:
         product_variation = []
         if request.method == 'POST':
@@ -47,9 +52,15 @@ def add_cart(request, product_id):
                 index = ex_var_list.index(product_variation)
                 item_id = id[index]
                 item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
+                if item.quantity >= product.stock:
+                    messages.warning(request, f'Chỉ còn {product.stock} sản phẩm trong kho.')
+                else:
+                    item.quantity += 1
+                    item.save()
             else:
+                if product.stock < 1:
+                    messages.error(request, 'Sản phẩm đã hết hàng. Không thể thêm vào giỏ.')
+                    return redirect(request.META.get('HTTP_REFERER', 'shop:shop'))
                 item = CartItem.objects.create(product=product, quantity=1, user=current_user)
                 if len(product_variation) > 0 :
                     item.variation.clear()
@@ -57,6 +68,9 @@ def add_cart(request, product_id):
                 item.save()
 
         else:
+            if product.stock < 1:
+                messages.error(request, 'Sản phẩm đã hết hàng. Không thể thêm vào giỏ.')
+                return redirect(request.META.get('HTTP_REFERER', 'shop:shop'))
             cart_item = CartItem.objects.create(
                 product=product,
                 quantity = 1,
@@ -104,9 +118,15 @@ def add_cart(request, product_id):
                 index = ex_var_list.index(product_variation)
                 item_id = id[index]
                 item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
+                if item.quantity >= product.stock:
+                    messages.warning(request, f'Chỉ còn {product.stock} sản phẩm trong kho.')
+                else:
+                    item.quantity += 1
+                    item.save()
             else:
+                if product.stock < 1:
+                    messages.error(request, 'Sản phẩm đã hết hàng. Không thể thêm vào giỏ.')
+                    return redirect(request.META.get('HTTP_REFERER', 'shop:shop'))
                 item = CartItem.objects.create(product=product, quantity=1, cart=cart)
                 if len(product_variation) > 0 :
                     item.variation.clear()
@@ -114,6 +134,9 @@ def add_cart(request, product_id):
                 item.save()
 
         else:
+            if product.stock < 1:
+                messages.error(request, 'Sản phẩm đã hết hàng. Không thể thêm vào giỏ.')
+                return redirect(request.META.get('HTTP_REFERER', 'shop:shop'))
             cart_item = CartItem.objects.create(
                 product=product,
                 quantity = 1,
@@ -206,6 +229,8 @@ def update_cart_ajax(request):
                 cart_item = CartItem.objects.get(id=cart_item_id, cart=cart)
 
             if action == 'increase':
+                if cart_item.quantity >= cart_item.product.stock:
+                    return JsonResponse({'status': 'error', 'message': 'Sản phẩm đã đạt số lượng tối đa trong kho.'})
                 cart_item.quantity += 1
             elif action == 'decrease':
                 if cart_item.quantity > 1:
