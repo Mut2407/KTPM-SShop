@@ -1,68 +1,71 @@
-name: Django CI/CD
+name: Django CI/CD Docker
 
 on:
   push:
     branches: ["master", "main"]
   pull_request:
     branches: ["master", "main"]
-  workflow_dispatch: # Cho phép chạy thủ công từ tab Actions
-
-permissions:
-  contents: read
-
-concurrency:
-  group: django-ci-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
-  # JOB 1: TEST & LINT (CI)
+  # --- JOB 1: CI (Test & Lint) ---
   test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.10"] # Khớp với phiên bản bạn mong muốn
+        python-version: ["3.10"]
 
-    # Giả lập biến môi trường để Django không bị lỗi khi start
     env:
       DJANGO_SETTINGS_MODULE: core.settings
-      SECRET_KEY: "temporary_secret_key_for_testing_ci" 
-      # Nếu settings.py của bạn đã hardcode SECRET_KEY thì dòng trên không cần, 
-      # nhưng tốt nhất là nên dùng biến môi trường.
+      SECRET_KEY: "secret_for_testing" # Key tạm để chạy test
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-
+          cache: pip
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 # Cài thêm flake8 để kiểm tra lỗi cú pháp code
-
+          pip install flake8
       - name: Lint with flake8
         run: |
-          # Dừng build nếu có lỗi cú pháp Python hoặc biến chưa định nghĩa
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Cảnh báo các lỗi format (dòng quá dài, v.v.) nhưng không dừng build
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
       - name: Run Tests
         run: |
           python manage.py test
 
-  # JOB 2: DEPLOY (CD)
-  # Job này chỉ chạy khi Job 'test' thành công và chỉ chạy trên nhánh master/main
-  deploy:
+  # --- JOB 2: CD (Build & Push Docker) ---
+  build-and-push:
     runs-on: ubuntu-latest
-    needs: test # Bắt buộc phải test xong mới được deploy
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    needs: test # QUAN TRỌNG: Chỉ chạy CD khi CI (test) đã OK
+    # Chỉ chạy CD khi push vào nhánh chính, không chạy khi tạo Pull Request
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Đổi 'ten-user-cua-ban' và 'ten-image' cho phù hợp
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ktpm-sshop:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ktpm-sshop:${{ github.sha }}
