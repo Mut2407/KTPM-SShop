@@ -58,9 +58,9 @@ def payment_method(request):
 
         # TÍNH TIỀN
         total_price = sum(item.product.price * item.quantity for item in cart_items)
-        vat = round(total_price * 0.02, 2)
+        vat = round(float(total_price) * 0.02, 2)
         handing = 15
-        total = total_price + vat + handing
+        total = float(total_price) + vat + handing
 
         # TẠO ORDER
         order = Order.objects.create(
