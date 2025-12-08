@@ -41,6 +41,7 @@ jobs:
           python manage.py test accounts
           python manage.py test cart
           python manage.py test blog
+          python manage.py test orders
 
   # --- JOB 2: CD (Build & Push Docker) ---
   docker-build:
