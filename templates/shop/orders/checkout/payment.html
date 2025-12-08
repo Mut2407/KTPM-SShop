@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Payment{% endblock title %}
 {% block content %}
-<!-- pages-title-start -->
+
 <div class="pages-title section-padding">
   <div class="container">
     <div class="row">
@@ -10,7 +10,7 @@
         <div class="pages-title-text text-center">
           <h2 style="color:#f4cca4">Payment</h2>
           <ul class="text-left">
-            <li><a style="color:#d99879" href="\">Home </a></li>
+            <li><a style="color:#d99879" href="/">Home </a></li>
             <li style="color:#d99879"><span> // </span>Checkout</li>
           </ul>
         </div>
@@ -18,9 +18,7 @@
     </div>
   </div>
 </div>
-<!-- pages-title-end -->
-<!-- Checkout content section start -->
-<section style="margin-bottom:50;background:#1c1427" class="pages checkout section-padding">
+<section style="margin-bottom:50px; background:#1c1427" class="pages checkout section-padding">
   <div class="container">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
@@ -31,11 +29,7 @@
           </div>
           <div class="cart-form-text pay-details table-responsive text-center">
             <table class="tablee" style="width:100%" >
-              <thead>
-                
-              </thead>
               <tbody>
-                
                 <tr>
                   <th style="font-size:15px">Name</th>
                   <td style="font-size:15px">{{order.full_name}}</td>
@@ -68,19 +62,24 @@
                 {% endif %}
               </tbody>
               <br>
-            </table><br><br>
+            </table>
+            <br><br>
+            
             <div class="log-title text-center">
               <h2><strong style="color:#d99879">Payment Method</strong></h2><br>
             </div>
-          <h3 style="font-size:15px; margin-left:30px" class="floatleft">VNPAY</h3><br><br>
-          <h3 style="font-size:15px; margin-left:30px" class="floatleft">COD</h3><br><br>
+            <div style="text-align: center;">
+                 <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png" height="50px" alt="VNPay Logo">
+                 <h4 style="color: #0056b3; margin-top: 10px;">VNPAY</h4>
+            </div>
           </div>
         </div><br>
       </div>
+
       <div class="col-xs-12 col-sm-6">
         <div style="border-radius:20px" class="padding60">
           <div class="log-title text-center">
-            <h2><strong style="color:#d99879">order</strong></h2>
+            <h2><strong style="color:#d99879">Your Order</strong></h2>
           </div><br><br>
           <div class="cart-form-text pay-details table-responsive text-center">
             <table style="width:100%;" >
@@ -102,42 +101,26 @@
                   <td>${{handing}}</td>
                 </tr>
                 <tr>
-                  <th>Vat</th>
+                  <th>VAT</th>
                   <td>${{vat}}</td>
                 </tr>
-                <tr style="color:#d99879">
+                <tr style="color:#d99879; font-size: 18px;">
                   <th>Order total</th>
-                  <td>${{order_total}}</td>
+                  <td><strong>${{order_total}}</strong></td>
                 </tr>
               </tbody>
-              <tfoot>
-              </tfoot>
             </table>
-            <div style="width:100%" class="submit-text">
-              
-                {% comment %} <button href="#" class="btn btn-warning"
-                style="background:#f4cca4;color:#1c1427; width:100% ; text-transform: capitalize;font-size:15px"><b>Place
-                  Order</b></button> {% endcomment %}
-                <a href="{% url 'orders:vnpay_payment' %}?order_number={{ order.order_number }}" class="btn btn-success">Thanh toán ngay</a> 
-              {% comment %} <!-- Paypal button -->
-              <div id="paypal-button-container" style="margin-bottom:15px;"></div>
-              <button style="
-                width:100%;
-                background:#1c1427;
-                color:white;
-                font-weight:600;
-                border:2px solid #333;
-                border-radius:12px;
-                padding:12px 0;
-                cursor:pointer;
-                transition:0.2s;
-              " 
-              onmouseover="this.style.background='#2a2238'"
-              onmouseout="this.style.background='#1c1427'">
-                Debit or Credit Card
-              </button> {% endcomment %}
 
-              <p style="color:#777; font-size:12px; margin-top:12px;">Powered by <span style="color:#0070ba;">PayPal</span></p>
+            <div style="width:100%; margin-top: 30px;" class="submit-text">
+                
+                <a href="{% url 'orders:vnpay_payment' %}?order_number={{ order.order_number }}" 
+                   class="btn" 
+                   style="background: #0056b3; color: #fff; width: 100%; font-size: 18px; padding: 15px; border-radius: 8px; border: none; transition: 0.3s;">
+                   <b><i class="fa fa-credit-card"></i> Payment via VNPAY</b>
+                </a>
+                
+                <p style="color:#777; font-size:12px; margin-top:12px;">Secured by VNPAY</p>
+
             </div>
           </div>
         </div>
@@ -145,91 +128,5 @@
     </div>
   </div>
 </section>
-
-
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
-
-<script>
-
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
-      }
-  }
-  return cookieValue;
-}
-
-var amount = "{{ order_total }}"
-var url = "{% url 'orders:payments' %}"
-var csrftoken = getCookie('csrftoken');
-var orderID = "{{order.order_number}}"
-var payment_method = 'PayPal'
-var redirect_url = "{% url 'orders:order_complete' %}"
-    // Render the PayPal button into #paypal-button-container
-    paypal.Buttons({
-      // Customize button (optional)
-       
-        style: {
-            layout: 'vertical',
-            color: 'gold',
-            shape: 'rect',
-            label: 'pay',
-            height: 45
-        },
-        
-        // Set up the transaction
-        createOrder: function(data, actions) {
-          
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: amount,
-                    }
-                }]
-            });
-            
-        },
-
-		// Finalize the transaction
-		onApprove: function(data, actions) {
-			return actions.order.capture().then(function(details) {
-				// Show a success message to the buyer
-				console.log(details);
-				sendData();
-				function sendData(){
-					fetch(url, {
-						method : "POST",
-						headers: {
-							"Content-type": "application/json",
-							"X-CSRFToken": csrftoken,
-						},
-						body: JSON.stringify({
-							orderID: orderID,
-							transID: details.id,
-							payment_method: payment_method,
-							status: details.status,
-						}),
-					})
-				  .then((response) => response.json())
-				  .then((data) => {
-						window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-					});
-				}
-        // alert('Transaction completed by ' + details.payer.name.given_name + '!');
-			});
-		}
-
-
-	}).render('#paypal-button-container');
-</script>
 
 {% endblock content %}

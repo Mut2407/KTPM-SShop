@@ -180,12 +180,18 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
 # AWS_STORAGE_BUCKET_NAME = 'e--shop-bucket'
-
+ 
 if os.getcwd() == '/app' :
     DEBUG = False
     
 # VNPAY Settings
-VNPAY_TMN_CODE = '5U1CPRF2'
-VNPAY_HASH_SECRET = 'KZTXORU9U6FOEFHMU5PWNV0EJQXC8UDL'
-VNPAY_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'
-VNPAY_RETURN_URL = 'https://supersecularly-octennially-elenora.ngrok-free.dev/payment-return/'
+VNPAY_TMN_CODE = os.getenv('VNPAY_TMN_CODE')
+VNPAY_HASH_SECRET = os.getenv('VNPAY_HASH_SECRET')
+VNPAY_URL = os.getenv('VNPAY_URL')
+VNPAY_RETURN_URL = os.getenv('VNPAY_RETURN_URL')
+
+
+# VNPAY_TMN_CODE = '5U1CPRF2'
+# VNPAY_HASH_SECRET = 'KZTXORU9U6FOEFHMU5PWNV0EJQXC8UDL'
+# VNPAY_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'
+# VNPAY_RETURN_URL = 'http://127.0.0.1:8000/orders/payment-return/'
