@@ -184,8 +184,3 @@ EMAIL_HOST_PASSWORD = 'runycbksfzywhegl' #os.environ.get('EMAIL_HOST_PASSWORD')
 if os.getcwd() == '/app' :
     DEBUG = False
     
-# VNPAY Settings
-VNPAY_TMN_CODE = '5U1CPRF2'
-VNPAY_HASH_SECRET = 'KZTXORU9U6FOEFHMU5PWNV0EJQXC8UDL'
-VNPAY_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'
-VNPAY_RETURN_URL = 'https://supersecularly-octennially-elenora.ngrok-free.dev/payment-return/'
