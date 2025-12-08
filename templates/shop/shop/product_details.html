@@ -234,11 +234,11 @@
                                             <h5>Product rating</h5>
 
                                             <div class="rate">
-                                                {% for val in "10,9,8,7,6,5,4,3,2,1"|cut:"," %}
-                                                    <input type="radio" name="rating" id="rating{{ val }}"
-                                                          value="{{ val|float|div:2 }}" required>
-                                                    <label for="rating{{ val }}"
-                                                          {% if val|float % 2 != 0 %}class="half"{% endif %}></label>
+                                                {% for val in "5.0,4.5,4.0,3.5,3.0,2.5,2.0,1.5,1.0,0.5"|cut:"," %}
+                                                    <input type="radio" name="rating" id="rating{{ val|slugify }}"
+                                                           value="{{ val }}" required>
+                                                    <label for="rating{{ val|slugify }}"
+                                                           {% if val|slice:"-2:" == ".5" %}class="half"{% endif %}></label>
                                                 {% endfor %}
                                             </div>
 
