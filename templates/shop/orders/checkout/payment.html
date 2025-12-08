@@ -1,6 +1,6 @@
-{% extends '../../../base.html' %}
-{% load static %}
-{% block title %}Payment{% endblock title %}
+{% extends '../../../base.html' %} 
+{% load static %} 
+{% block title %}Payment{%endblock title %} 
 {% block content %}
 
 <!-- Title -->
@@ -181,8 +181,21 @@
             <div class="submit-text" style="width: 100%; margin-top: 20px">
               <button
                 onclick="submitPayment()"
-                class="btn btn-success"
-                style="width: 100%; font-size: 16px"
+                class="btn"
+                style="
+                  width: 100%;
+                  font-size: 18px;
+                  font-weight: bold;
+                  padding: 12px 0;
+                  background-color: #ff6f61;
+                  color: white;
+                  border: none;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                  transition: background-color 0.3s ease;
+                "
+                onmouseover="this.style.backgroundColor='#e65c50'"
+                onmouseout="this.style.backgroundColor='#ff6f61'"
               >
                 Thanh Toán Ngay
               </button>
