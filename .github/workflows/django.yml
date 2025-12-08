@@ -9,7 +9,7 @@ on:
 
 jobs:
   # --- JOB 1: CI (Test & Lint) ---
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -41,9 +41,9 @@ jobs:
           python manage.py test
 
   # --- JOB 2: CD (Build & Push Docker) ---
-  build-and-push:
+  docker-build:
     runs-on: ubuntu-latest
-    needs: test # QUAN TRỌNG: Chỉ chạy CD khi CI (test) đã OK
+    needs: build-and-test # QUAN TRỌNG: Chỉ chạy CD khi CI (test) đã OK
     # Chỉ chạy CD khi push vào nhánh chính, không chạy khi tạo Pull Request
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     
