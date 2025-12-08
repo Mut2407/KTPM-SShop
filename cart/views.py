@@ -1,3 +1,5 @@
+from django.http import HttpResponse, JsonResponse 
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
@@ -187,3 +189,63 @@ def cart(request, total_price=0, quantity=0, cart_items=None):
 
     return render(request, 'shop/cart/cart.html', context)
 
+
+# fix update cart ajax
+def update_cart_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cart_item_id = data.get('cartItemID')
+            action = data.get('action') # 'increase' or 'decrease'
+            
+            # find CartItem 
+            if request.user.is_authenticated:
+                cart_item = CartItem.objects.get(id=cart_item_id, user=request.user)
+            else:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                cart_item = CartItem.objects.get(id=cart_item_id, cart=cart)
+
+            if action == 'increase':
+                cart_item.quantity += 1
+            elif action == 'decrease':
+                if cart_item.quantity > 1:
+                    cart_item.quantity -= 1
+                else:
+                    pass 
+            
+            cart_item.save()
+
+            total_price = 0
+            quantity = 0
+            
+            if request.user.is_authenticated:
+                cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            else:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
+            for item in cart_items:
+                total_price += (item.product.price * item.quantity)
+                quantity += item.quantity
+
+            tax = round(((2 * total_price)/100), 2)
+            grand_total = total_price + tax
+            handling = 15.00
+            order_total = float(grand_total) + handling
+
+            return JsonResponse({
+                'status': 'success',
+                'item_qty': cart_item.quantity,
+                'item_subtotal': cart_item.sub_total(),
+                'cart_subtotal': total_price,
+                'tax': tax,
+                'order_total': order_total,
+                'cart_count': quantity
+            })
+
+        except ObjectDoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Item not found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+        
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
