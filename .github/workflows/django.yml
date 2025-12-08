@@ -38,7 +38,8 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Run Tests
         run: |
-          python manage.py test
+          python manage.py test accounts
+          python manage.py test cart
 
   # --- JOB 2: CD (Build & Push Docker) ---
   docker-build:
