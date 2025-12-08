@@ -181,6 +181,8 @@ EMAIL_HOST_PASSWORD = 'runycbksfzywhegl' #os.environ.get('EMAIL_HOST_PASSWORD')
 
 # AWS_STORAGE_BUCKET_NAME = 'e--shop-bucket'
 
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
 if os.getcwd() == '/app' :
     DEBUG = False
     
