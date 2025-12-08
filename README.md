@@ -36,7 +36,7 @@ pip install virtualenv
 3. create new virtual environment
 
 ```bash
-py -m venv venv
+python -m venv venv
 ```
 
 4. activate the new virtual
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 6. run local server to begin
 
 ```bash
-py manage.py runserver
+python manage.py runserver
 ```
 
 7.  go live with [localhost:8000](http://localhost:8000/)
@@ -66,7 +66,7 @@ py manage.py runserver
 1.  run on terminal
 
 ```bash
-py manage.py createsuperuser
+python manage.py createsuperuser
 ```
 
 2.  create new admin user
