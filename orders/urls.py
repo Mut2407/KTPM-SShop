@@ -9,7 +9,7 @@ urlpatterns = [
     path('payment/', views.payment, name='payment'),
     path('payments/', views.payments, name='payments'),
     path('order_completed/', views.order_completed, name='order_complete'),
-    path('vnpay-payment/', views.vnpay_payment, name='vnpay_payment'),
-    path('payment-return/', views.vnpay_return, name='vnpay_return'),
-    path('order_completed/', views.order_completed, name='order_complete'),
+    path('vnpay_payment/', views.vnpay_payment, name='vnpay_payment'),
+    path('vnpay-payment/', views.vnpay_payment, name='vnpay_payment_dash'),
+    path('vnpay-return/', views.vnpay_return, name='vnpay_return'),
 ]

@@ -8,7 +8,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
-
+from django.urls import reverse
+from django.utils import timezone
 
 from cart.models import CartItem, Cart
 from cart.views import _cart_id
@@ -30,32 +31,49 @@ def payment_method(request):
 def checkout(request,total=0, total_price=0, quantity=0, cart_items=None):
     tax = 0.00
     handing = 0.00
+
+    # ----- Tính toán giỏ hàng -----
     try:
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
         for cart_item in cart_items:
-            total_price += (cart_item.product.price * cart_item.quantity)
+            total_price += cart_item.product.price * cart_item.quantity
             quantity += cart_item.quantity
-        total = total_price + 10
 
     except ObjectDoesNotExist:
-        pass # just ignore
+        pass
 
-    
-    tax = round(((2 * total_price)/100), 2)
-    grand_total = total_price + tax
+    tax = round(((2 * total_price) / 100), 2)
     handing = 15.00
+    grand_total = total_price + tax
     total = float(grand_total) + handing
-    
+
+    # ----------XỬ LÝ POST THANH TOÁN ----------
+    if request.method == "POST":
+        # Tạo order trước khi chuyển đến VNPAY Fake
+        order = Order.objects.create(
+            user = request.user if request.user.is_authenticated else None,
+            order_number = timezone.now().strftime("%Y%m%d%H%M%S"),
+            order_total = total,
+            tax = tax,
+            status = "PENDING"
+        )
+
+        # URL → Fake VNPAY
+        vnpay_url = f"/orders/vnpay_payment/?order_number={order.order_number}"
+        return redirect(vnpay_url)
+
+    # ---------- Trả về HTML nếu là GET ----------
     context = {
         'total_price': total_price,
         'quantity': quantity,
-        'cart_items':cart_items,
+        'cart_items': cart_items,
         'handing': handing,
-        'vat' : tax,
+        'vat': tax,
         'order_total': total,
     }
     return render(request, 'shop/orders/checkout/checkout.html', context)
@@ -233,93 +251,6 @@ def payments(request):
     except (Payment.DoesNotExist, Order.DoesNotExist):
         return redirect('shop:shop')
     
-    
-@login_required(login_url='accounts:login')
-def vnpay_payment(request):
-    order_number = request.GET.get('order_number')
-    order = get_object_or_404(Order, user=request.user, is_ordered=False, order_number=order_number)
-
-    amount = int(order.order_total)
-    input_data = {
-        'vnp_Version': '2.1.0',
-        'vnp_Command': 'pay',
-        'vnp_TmnCode': settings.VNPAY_TMN_CODE,
-        'vnp_Amount': str(amount * 100),
-        'vnp_CreateDate': datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
-        'vnp_CurrCode': 'VND',
-        'vnp_IpAddr': request.META.get('REMOTE_ADDR', '127.0.0.1'),
-        'vnp_Locale': 'vn',
-        'vnp_OrderInfo': f'Thanh toán đơn hàng {order.order_number}',
-        'vnp_OrderType': 'other',
-        'vnp_ReturnUrl': settings.VNPAY_RETURN_URL,
-        'vnp_TxnRef': order.order_number,
-    }
-
-    sorted_data = sorted(input_data.items())
-    hash_data = '&'.join([f"{k}={v}" for k, v in sorted_data])
-    secure_hash = hmac.new(
-        settings.VNPAY_HASH_SECRET.encode(),
-        hash_data.encode(),
-        hashlib.sha512
-    ).hexdigest()
-
-
-
-    query_string = urlencode(sorted_data)
-    payment_url = f"{settings.VNPAY_URL}?{query_string}&vnp_SecureHash={secure_hash}"
-
-    return redirect(payment_url)
-
-
-@login_required(login_url='accounts:login')
-def vnpay_return(request):
-    response_code = request.GET.get('vnp_ResponseCode')
-    txn_ref = request.GET.get('vnp_TxnRef')
-    transaction_id = request.GET.get('vnp_TransactionNo')
-
-    order = get_object_or_404(Order, order_number=txn_ref, user=request.user, is_ordered=False)
-
-    if response_code == '00':
-        # Tạo bản ghi thanh toán
-        payment = Payment.objects.create(
-            user=request.user,
-            payment_id=transaction_id,
-            payment_method='VNPay',
-            status='Success',
-            amount_paid=order.order_total,
-        )
-
-        # Cập nhật đơn hàng
-        order.payment = payment
-        order.is_ordered = True
-        order.save()
-
-        # Di chuyển sản phẩm từ giỏ hàng sang OrderProduct
-        cart_items = CartItem.objects.filter(user=request.user)
-        for item in cart_items:
-            orderproduct = OrderProduct.objects.create(
-                order=order,
-                payment=payment,
-                user=request.user,
-                product=item.product,
-                quantity=item.quantity,
-                product_price=item.product.price,
-                ordered=True,
-            )
-            orderproduct.variations.set(item.variation.all())
-            orderproduct.save()
-
-            item.product.stock -= item.quantity
-            item.product.save()
-
-        cart_items.delete()
-
-        return redirect(f'/orders/order_completed/?order_number={order.order_number}&payment_id={payment.payment_id}')
-    else:
-        messages.error(request, 'Thanh toán thất bại hoặc bị hủy.')
-        return redirect('orders:checkout')
-
-
 def order_completed(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
@@ -340,4 +271,67 @@ def order_completed(request):
     }
     return render(request, 'shop/orders/order_completed/order_completed.html', context)
 
+@login_required(login_url='accounts:login')
+def vnpay_payment(request):
+    order_number = request.GET.get("order_number")
+
+    # Lấy đơn hàng trong DB (nếu bạn có model Order)
+    order = Order.objects.get(order_number=order_number)
+
+    return_url = request.build_absolute_uri("/orders/vnpay-return/")
+
+    context = {
+        "order_number": order_number,
+        "order_description": "Thanh toán đơn hàng #" + order_number,
+        "amount": int(order.order_total),  # tổng tiền cần thanh toán
+        "return_url": return_url,
+    }
+
+    return render(request, "shop/orders/vnpay_payment.html", context)
+
+
+@login_required(login_url='accounts:login')
+@login_required(login_url='accounts:login')
+def vnpay_return(request):
+    response_code = request.GET.get("vnp_ResponseCode")
+    order_number = request.GET.get("vnp_TxnRef")
+
+    try:
+        order = Order.objects.get(order_number=order_number)
+    except:
+        return redirect("/?payment=notfound")
+
+    # Code 00 = Thanh toán thành công
+    if response_code == "00":
+
+        # ---- ĐÁNH DẤU ĐƠN HÀNG ĐÃ MUA ----
+        order.status = "PAID"
+        order.is_ordered = True     #  <<<<<< IMPORTANT
+        order.save()
+
+        # ---- CHUYỂN SẢN PHẨM TỪ CART -> ORDER PRODUCT ----
+        cart_items = CartItem.objects.filter(user=request.user)
+        for item in cart_items:
+            OrderProduct.objects.create(
+                order=order,
+                user=request.user,
+                product=item.product,
+                quantity=item.quantity,
+                product_price=item.product.price,
+                ordered=True
+            )
+
+            # Giảm kho sản phẩm
+            product = item.product
+            product.stock -= item.quantity
+            product.save()
+
+        # Xóa giỏ hàng sau khi đặt hàng
+        CartItem.objects.filter(user=request.user).delete()
+
+        return redirect("/")
+    else:
+        order.status = "FAILED"
+        order.save()
+        return redirect("/?payment=failed")
 

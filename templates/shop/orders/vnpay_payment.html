@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>VNPAY - Cổng thanh toán</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 480px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 25px 30px;
+        }
+        .logo {
+            text-align: center;
+        }
+        .logo img {
+            width: 160px;
+        }
+        h2 {
+            text-align: center;
+            color: #0074ff;
+            margin-top: 10px;
+        }
+        .info-box {
+            background: #f0f7ff;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #0074ff;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 15px;
+        }
+        .info-row strong {
+            color: #333;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .btn {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 14px 0;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        .success {
+            background: #28a745;
+        }
+        .failed {
+            background: #dc3545;
+        }
+        .note {
+            text-align: center;
+            margin-top: 15px;
+            color: gray;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="logo">
+            <img src="https://vnpay.vn/wp-content/uploads/2020/08/logo-vnpay.png" alt="VNPAY">
+        </div>
+
+        <h2>Xác nhận thanh toán</h2>
+
+        <div class="info-box">
+            <div class="info-row">
+                <strong>Mã đơn hàng:</strong> <span>{{ order_number }}</span>
+            </div>
+            <div class="info-row">
+                <strong>Sản phẩm:</strong> <span>{{ order_description }}</span>
+            </div>
+            <div class="info-row">
+                <strong>Tổng tiền:</strong> <span style="color:#e60000">{{ amount }} VNĐ</span>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a class="btn success"
+               href="{{ return_url }}?vnp_ResponseCode=00&vnp_TxnRef={{ order_number }}&vnp_Amount={{ amount }}&vnp_TransactionNo=FAKE-SUCCESS-{{ order_number }}">
+               Xác nhận thanh toán thành công
+            </a>
+
+            {% comment %} <a class="btn failed"
+               href="{{ return_url }}?vnp_ResponseCode=24&vnp_TxnRef={{ order_number }}&vnp_Amount={{ amount }}&vnp_TransactionNo=FAKE-FAIL-{{ order_number }}">
+               Thanh toán thất bại
+            </a> {% endcomment %}
+        </div>
+    </div>
+</body>
+</html>
