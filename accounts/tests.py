@@ -76,44 +76,38 @@ class AccountSystemTest(TestCase):
         }
 
     def test_full_authentication_flow(self):
-        # --- BƯỚC 1: ĐĂNG KÝ (Register) ---
+        # --- ĐĂNG KÝ (Register) ---
         print("\n[System Test] 1. User Registering...")
         self.client.post(self.register_url, self.sys_user_data)
         
         # Lấy user từ DB ra
         user = Account.objects.get(email='system@example.com')
         
-        # --- BƯỚC 2: GIẢ LẬP KÍCH HOẠT (Activate) ---
-        # Thực tế user sẽ click link email, trong test ta set trực tiếp
         print("[System Test] 2. Simulating Email Activation...")
         user.is_active = True
         user.save()
 
-        # --- BƯỚC 3: ĐĂNG NHẬP (Login) ---
+        # --- ĐĂNG NHẬP (Login) ---
         print("[System Test] 3. User Logging in...")
         response = self.client.post(self.login_url, {
             'email': 'system@example.com',
             'password': 'password123'
         })
         
-        # Kiểm tra login thành công (thường redirect về Dashboard hoặc trang trước đó)
+        # Kiểm tra login thành công 
         self.assertEqual(response.status_code, 302)
 
-        # --- BƯỚC 4: TRUY CẬP DASHBOARD ---
-        # Vì session client vẫn giữ trạng thái login, ta request vào trang dashboard
         print("[System Test] 4. Accessing Dashboard...")
         response = self.client.get(self.dashboard_url)
         
-        # Phải vào được (Code 200), nếu chưa login sẽ bị redirect (302)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'System User') # Kiểm tra tên hiển thị
+        self.assertContains(response, 'System User')
 
-        # --- BƯỚC 5: ĐĂNG XUẤT (Logout) ---
+        # --- ĐĂNG XUẤT (Logout) ---
         print("[System Test] 5. User Logging out...")
         self.client.get(self.logout_url)
         
-        # --- BƯỚC 6: KIỂM TRA LẠI (Re-check) ---
-        # Sau khi logout, truy cập lại dashboard phải bị chặn (Redirect 302 về Login)
+        # Sau khi logout, truy cập lại dashboard
         response = self.client.get(self.dashboard_url)
         self.assertNotEqual(response.status_code, 200)
         print("[System Test] Flow Completed Successfully ")
