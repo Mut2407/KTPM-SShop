@@ -33,6 +33,6 @@ class BlogTest(TestCase):
         # 1. Kiểm tra HTTP Status Code = 200 (Thành công)
         self.assertEqual(response.status_code, 200)
         
-        # 2. Kiểm tra nội dung bài viết có hiển thị trên HTML không
+        # 2. Kiểm tra nội dung bài viết có hiển thị không
         self.assertContains(response, "Bài viết test")
         self.assertContains(response, "Nội dung bài viết mẫu")
