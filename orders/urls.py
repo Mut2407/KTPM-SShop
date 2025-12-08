@@ -8,8 +8,9 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('payment/', views.payment, name='payment'),
     path('payments/', views.payments, name='payments'),
-    path('order_completed/', views.order_completed, name='order_complete'),
+    path('order_completed/', views.order_completed, name='order_completed'),
     path('vnpay_payment/', views.vnpay_payment, name='vnpay_payment'),
-    path('vnpay-payment/', views.vnpay_payment, name='vnpay_payment_dash'),
     path('vnpay-return/', views.vnpay_return, name='vnpay_return'),
+    #path('vnpay-payment/', views.vnpay_payment, name='vnpay_payment_dash'),
+    path('cod-payment/', views.cod_payment, name='cod_payment'),
 ]

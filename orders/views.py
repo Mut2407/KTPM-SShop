@@ -22,9 +22,41 @@ from shop.models import Product
 from urllib.parse import urlencode
 from django.conf import settings
 
-@login_required(login_url = 'accounts:login')
+@login_required(login_url='accounts:login')
 def payment_method(request):
-    return render(request, 'shop/orders/payment_method.html',)
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    if not cart_items.exists():
+        messages.error(request, "Giỏ hàng trống.")
+        return redirect("cart:cart")
+
+    if request.method == "POST":
+        method = request.POST.get("payment_method")
+
+        # TÍNH TIỀN
+        total_price = sum(item.product.price * item.quantity for item in cart_items)
+        vat = round(total_price * 0.02, 2)
+        handing = 15
+        total = total_price + vat + handing
+
+        # TẠO ORDER
+        order = Order.objects.create(
+            user=request.user,
+            order_number=timezone.now().strftime("%Y%m%d%H%M%S"),
+            order_total=total,
+            tax=vat,
+            status="PENDING",
+        )
+
+        # COD → HOÀN TẤT NGAY
+        if method == "COD":
+            return complete_cod_payment(request, order)
+
+        # VNPAY → CHUYỂN TỚI TRANG THANH TOÁN
+        if method == "VNPAY":
+            return redirect(f"/orders/vnpay-payment/?order_number={order.order_number}")
+
+    return render(request, 'shop/orders/payment_method.html')
 
 
 @login_required(login_url = 'accounts:login')
@@ -291,7 +323,6 @@ def vnpay_payment(request):
 
 
 @login_required(login_url='accounts:login')
-@login_required(login_url='accounts:login')
 def vnpay_return(request):
     response_code = request.GET.get("vnp_ResponseCode")
     order_number = request.GET.get("vnp_TxnRef")
@@ -335,3 +366,82 @@ def vnpay_return(request):
         order.save()
         return redirect("/?payment=failed")
 
+
+def complete_cod_payment(request, order):
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    payment = Payment.objects.create(
+        user=request.user,
+        payment_method="COD",
+        payment_id=f"COD-{order.order_number}",
+        status="SUCCESS",
+        amount_paid=order.order_total,
+    )
+
+    order.payment = payment
+    order.is_ordered = True
+    order.status = "PAID"
+    order.save()
+
+    for item in cart_items:
+        OrderProduct.objects.create(
+            order=order,
+            payment=payment,
+            user=request.user,
+            product=item.product,
+            quantity=item.quantity,
+            product_price=item.product.price,
+            ordered=True,
+        )
+
+        product = item.product
+        product.stock -= item.quantity
+        product.save()
+
+    cart_items.delete()
+
+    messages.success(request, "Thanh toán COD thành công!")
+    return redirect("/")
+
+
+@login_required(login_url='accounts:login')
+def cod_payment(request):
+    # Handle AJAX POST from payment.html
+    if request.method == 'POST':
+        try:
+            payload = {}
+            if request.body:
+                payload = json.loads(request.body)
+            order_number = payload.get('order_number')
+
+            if order_number:
+                order = Order.objects.filter(user=request.user, order_number=order_number, is_ordered=False).first()
+            else:
+                order = Order.objects.filter(user=request.user, is_ordered=False, status="PENDING").order_by('-id').first()
+
+            if not order:
+                return JsonResponse({'status': 'error', 'message': 'Không tìm thấy đơn hàng để thanh toán COD.'}, status=400)
+
+            # Complete COD payment using helper (returns a RedirectResponse we ignore)
+            complete_cod_payment(request, order)
+
+            # Build order info for client modal and redirect to order completed page
+            payment_id = f"COD-{order.order_number}"
+            redirect_url = f"/orders/order_completed/?order_number={order.order_number}&payment_id={payment_id}"
+
+            items_count = OrderProduct.objects.filter(order=order).count()
+
+            return JsonResponse({
+                'status': 'success',
+                'redirect_url': redirect_url,
+                'order_number': order.order_number,
+                'amount': float(order.order_total),
+                'items': items_count,
+                'payment_id': payment_id,
+                'payment_method': 'COD'
+            })
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Thanh toán COD thất bại.'}, status=500)
+
+    # Fallback: redirect to checkout when not POST
+    return redirect('orders:checkout')

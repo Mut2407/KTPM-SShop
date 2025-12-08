@@ -2,92 +2,157 @@
 {% load static %}
 {% block title %}Payment{% endblock title %}
 {% block content %}
-<!-- pages-title-start -->
+
+<!-- Title -->
 <div class="pages-title section-padding">
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
         <div class="pages-title-text text-center">
-          <h2 style="color:#f4cca4">Payment</h2>
+          <h2 style="color: #f4cca4">Payment</h2>
           <ul class="text-left">
-            <li><a style="color:#d99879" href="\">Home </a></li>
-            <li style="color:#d99879"><span> // </span>Checkout</li>
+            <li><a style="color: #d99879" href="/">Home</a></li>
+            <li style="color: #d99879"><span>//</span> Checkout</li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- pages-title-end -->
-<!-- Checkout content section start -->
-<section style="margin-bottom:50;background:#1c1427" class="pages checkout section-padding">
+
+<!-- Checkout Section -->
+<section
+  class="pages checkout section-padding"
+  style="background: #1c1427; margin-bottom: 50px"
+>
   <div class="container">
     <div class="row">
+      <!-- Billing Address -->
       <div class="col-xs-12 col-sm-6">
-        <div style="border-radius:20px;" class="padding60">
-          
+        <div class="padding60" style="border-radius: 20px">
           <div class="log-title text-center">
-            <h2><strong style="color:#d99879">Billing Address</strong></h2><br>
+            <h2><strong style="color: #d99879">Billing Address</strong></h2>
           </div>
+
           <div class="cart-form-text pay-details table-responsive text-center">
-            <table class="tablee" style="width:100%" >
-              <thead>
-                
-              </thead>
+            <table style="width: 100%">
               <tbody>
-                
                 <tr>
-                  <th style="font-size:15px">Name</th>
-                  <td style="font-size:15px">{{order.full_name}}</td>
+                  <th>Name</th>
+                  <td>{{order.full_name}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Email</th>
-                  <td style="font-size:15px">{{order.email}}</td>
+                  <th>Email</th>
+                  <td>{{order.email}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Phone Number</th>
-                  <td style="font-size:15px">{{order.phone}}</td>
+                  <th>Phone</th>
+                  <td>{{order.phone}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Address</th>
-                  <td style="font-size:15px">{{order.address}}</td>
+                  <th>Address</th>
+                  <td>{{order.address}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">City</th>
-                  <td style="font-size:15px">{{order.city}}</td>
+                  <th>City</th>
+                  <td>{{order.city}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Country</th>
-                  <td style="font-size:15px">{{order.country}}</td>
+                  <th>Country</th>
+                  <td>{{order.country}}</td>
                 </tr>
                 {% if order.order_note %}
                 <tr>
-                  <th style="font-size:15px">Order Note</th>
-                  <td style="font-size:15px">{{order.order_note}}</td>
+                  <th>Order Note</th>
+                  <td>{{order.order_note}}</td>
                 </tr>
                 {% endif %}
               </tbody>
-              <br>
-            </table><br><br>
-            <div class="log-title text-center">
-              <h2><strong style="color:#d99879">Payment Method</strong></h2><br>
+            </table>
+
+            <!-- Payment Method -->
+            <div class="log-title text-center" style="margin-top: 40px">
+              <h2><strong style="color: #d99879">Payment Method</strong></h2>
             </div>
-          <h3 style="font-size:15px; margin-left:30px" class="floatleft">VNPAY</h3><br><br>
-          <h3 style="font-size:15px; margin-left:30px" class="floatleft">COD</h3><br><br>
+
+            <div
+              style="
+                text-align: left;
+                margin-left: 30px;
+                font-size: 16px;
+                color: white;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  margin-bottom: 15px;
+                "
+              >
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="VNPAY"
+                  required
+                />
+                <span>VNPAY</span>
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  margin-bottom: 15px;
+                "
+              >
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="COD"
+                  required
+                />
+                <span>Cash On Delivery (COD)</span>
+              </label>
+            </div>
           </div>
-        </div><br>
+        </div>
       </div>
+
+      <!-- Order Summary -->
       <div class="col-xs-12 col-sm-6">
-        <div style="border-radius:20px" class="padding60">
+        <div class="padding60" style="border-radius: 20px">
           <div class="log-title text-center">
-            <h2><strong style="color:#d99879">order</strong></h2>
-          </div><br><br>
-          <div class="cart-form-text pay-details table-responsive text-center">
-            <table style="width:100%;" >
-              <thead style="border-radius:20px ;">
-                <tr >
-                  <th style="color:#f4cca4;background:#1c1427;border-radius:20px 0 0 20px ;">Product</th>
-                  <td style="color:#f4cca4;background:#1c1427;border-radius:0 20px 20px 0 ;">Total</td>
+            <h2><strong style="color: #d99879">Order</strong></h2>
+          </div>
+
+          <div
+            class="cart-form-text pay-details table-responsive text-center"
+            style="margin-top: 40px"
+          >
+            <table style="width: 100%">
+              <thead>
+                <tr>
+                  <th
+                    style="
+                      color: #f4cca4;
+                      background: #1c1427;
+                      border-radius: 20px 0 0 20px;
+                    "
+                  >
+                    Product
+                  </th>
+                  <th
+                    style="
+                      color: #f4cca4;
+                      background: #1c1427;
+                      border-radius: 0 20px 20px 0;
+                    "
+                  >
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -98,46 +163,130 @@
                 </tr>
                 {% endfor %}
                 <tr>
-                  <th>Shipping and Handing</th>
+                  <th>Shipping</th>
                   <td>${{handing}}</td>
                 </tr>
                 <tr>
-                  <th>Vat</th>
+                  <th>VAT</th>
                   <td>${{vat}}</td>
                 </tr>
-                <tr style="color:#d99879">
-                  <th>Order total</th>
+                <tr style="color: #d99879">
+                  <th>Order Total</th>
                   <td>${{order_total}}</td>
                 </tr>
               </tbody>
-              <tfoot>
-              </tfoot>
             </table>
-            <div style="width:100%" class="submit-text">
-              
-                {% comment %} <button href="#" class="btn btn-warning"
-                style="background:#f4cca4;color:#1c1427; width:100% ; text-transform: capitalize;font-size:15px"><b>Place
-                  Order</b></button> {% endcomment %}
-                <a href="{% url 'orders:vnpay_payment' %}?order_number={{ order.order_number }}" class="btn btn-success">Thanh toán ngay</a> 
-              {% comment %} <!-- Paypal button -->
-              <div id="paypal-button-container" style="margin-bottom:15px;"></div>
-              <button style="
-                width:100%;
-                background:#1c1427;
-                color:white;
-                font-weight:600;
-                border:2px solid #333;
-                border-radius:12px;
-                padding:12px 0;
-                cursor:pointer;
-                transition:0.2s;
-              " 
-              onmouseover="this.style.background='#2a2238'"
-              onmouseout="this.style.background='#1c1427'">
-                Debit or Credit Card
-              </button> {% endcomment %}
 
-              <p style="color:#777; font-size:12px; margin-top:12px;">Powered by <span style="color:#0070ba;">PayPal</span></p>
+            <!-- Submit Button -->
+            <div class="submit-text" style="width: 100%; margin-top: 20px">
+              <button
+                onclick="submitPayment()"
+                class="btn btn-success"
+                style="width: 100%; font-size: 16px"
+              >
+                Thanh Toán Ngay
+              </button>
+            </div>
+
+            <!-- Success Modal -->
+            <div
+              id="paymentSuccessOverlay"
+              style="
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 9998;
+              "
+            ></div>
+            <div
+              id="paymentSuccessModal"
+              style="
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 420px;
+                background: #241a33;
+                color: #fff;
+                border-radius: 14px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+                z-index: 9999;
+              "
+            >
+              <div
+                style="
+                  padding: 20px 24px;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <h4 style="margin: 0; color: #d99879">Payment Successful</h4>
+                <button
+                  onclick="closeSuccessModal()"
+                  style="
+                    background: transparent;
+                    border: none;
+                    color: #f4cca4;
+                    font-size: 20px;
+                    cursor: pointer;
+                  "
+                >
+                  ×
+                </button>
+              </div>
+              <div style="padding: 18px 24px">
+                <p style="margin: 0 0 8px 0; color: #f4cca4">
+                  Thank you for your purchase!
+                </p>
+                <p style="margin: 0 0 6px 0">
+                  Order Number: <strong id="sm-order-number"></strong>
+                </p>
+                <p style="margin: 0 0 6px 0">
+                  Total: <strong id="sm-order-amount"></strong>
+                </p>
+                <p style="margin: 0 0 0 0">
+                  Quantity: <strong id="sm-order-items"></strong>
+                </p>
+              </div>
+              <div
+                style="
+                  padding: 16px 24px;
+                  display: flex;
+                  gap: 10px;
+                  justify-content: flex-end;
+                "
+              >
+                <a
+                  id="sm-detail-link"
+                  class="btn btn-primary"
+                  style="
+                    background: #d99879;
+                    border: none;
+                    color: #1c1427;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                  "
+                  >Xem chi tiết</a
+                >
+                <button
+                  onclick="closeSuccessModal()"
+                  class="btn btn-default"
+                  style="
+                    background: #3a2a52;
+                    border: none;
+                    color: #f4cca4;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                  "
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -146,90 +295,86 @@
   </div>
 </section>
 
-
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
-
+<!-- JS -->
 <script>
-
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
-      }
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+      document.cookie.split(";").forEach((cookie) => {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
   }
-  return cookieValue;
-}
 
-var amount = "{{ order_total }}"
-var url = "{% url 'orders:payments' %}"
-var csrftoken = getCookie('csrftoken');
-var orderID = "{{order.order_number}}"
-var payment_method = 'PayPal'
-var redirect_url = "{% url 'orders:order_complete' %}"
-    // Render the PayPal button into #paypal-button-container
-    paypal.Buttons({
-      // Customize button (optional)
-       
-        style: {
-            layout: 'vertical',
-            color: 'gold',
-            shape: 'rect',
-            label: 'pay',
-            height: 45
-        },
-        
-        // Set up the transaction
-        createOrder: function(data, actions) {
-          
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: amount,
-                    }
-                }]
-            });
-            
-        },
+  function submitPayment() {
+    const method = document.querySelector(
+      'input[name="payment_method"]:checked'
+    );
+    if (!method) {
+      alert("Vui lòng chọn phương thức thanh toán!");
+      return;
+    }
 
-		// Finalize the transaction
-		onApprove: function(data, actions) {
-			return actions.order.capture().then(function(details) {
-				// Show a success message to the buyer
-				console.log(details);
-				sendData();
-				function sendData(){
-					fetch(url, {
-						method : "POST",
-						headers: {
-							"Content-type": "application/json",
-							"X-CSRFToken": csrftoken,
-						},
-						body: JSON.stringify({
-							orderID: orderID,
-							transID: details.id,
-							payment_method: payment_method,
-							status: details.status,
-						}),
-					})
-				  .then((response) => response.json())
-				  .then((data) => {
-						window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
-					});
-				}
-        // alert('Transaction completed by ' + details.payer.name.given_name + '!');
-			});
-		}
+    const paymentMethod = method.value;
+    const orderNumber = "{{ order.order_number }}";
 
+    // VNPAY
+    if (paymentMethod === "VNPAY") {
+      window.location.href =
+        "{% url 'orders:vnpay_payment' %}?order_number=" + orderNumber;
+      return;
+    }
 
-	}).render('#paypal-button-container');
+    // COD
+    fetch("{% url 'orders:cod_payment' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify({ order_number: orderNumber }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          openSuccessModal(data);
+          // Optional auto-redirect after 3 seconds
+          setTimeout(function () {
+            window.location.href = data.redirect_url;
+          }, 3000);
+        } else {
+          alert("Không thể xử lý thanh toán COD!");
+        }
+      });
+  }
+
+  function openSuccessModal(data) {
+    const overlay = document.getElementById("paymentSuccessOverlay");
+    const modal = document.getElementById("paymentSuccessModal");
+    document.getElementById("sm-order-number").innerText =
+      data.order_number || "";
+    document.getElementById("sm-order-amount").innerText =
+      data.amount !== undefined ? "$" + data.amount : "";
+    document.getElementById("sm-order-items").innerText =
+      data.items !== undefined ? data.items : "";
+    const detailLink = document.getElementById("sm-detail-link");
+    if (detailLink && data.redirect_url) {
+      detailLink.href = data.redirect_url;
+    }
+    if (overlay) overlay.style.display = "block";
+    if (modal) modal.style.display = "block";
+  }
+
+  function closeSuccessModal() {
+    const overlay = document.getElementById("paymentSuccessOverlay");
+    const modal = document.getElementById("paymentSuccessModal");
+    if (overlay) overlay.style.display = "none";
+    if (modal) modal.style.display = "none";
+  }
 </script>
 
-{% endblock content %}
+{% endblock %}

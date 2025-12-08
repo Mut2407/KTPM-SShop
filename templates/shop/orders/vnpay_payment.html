@@ -85,29 +85,29 @@
             <img src="https://vnpay.vn/wp-content/uploads/2020/08/logo-vnpay.png" alt="VNPAY">
         </div>
 
-        <h2>Xác nhận thanh toán</h2>
+        <h2>Confirm Payment</h2>
 
         <div class="info-box">
             <div class="info-row">
-                <strong>Mã đơn hàng:</strong> <span>{{ order_number }}</span>
+                <strong>Order Number:</strong> <span>{{ order_number }}</span>
             </div>
             <div class="info-row">
-                <strong>Sản phẩm:</strong> <span>{{ order_description }}</span>
+                <strong>Product:</strong> <span>{{ order_description }}</span>
             </div>
             <div class="info-row">
-                <strong>Tổng tiền:</strong> <span style="color:#e60000">{{ amount }} VNĐ</span>
+                <strong>Total:</strong> <span style="color:#e60000">{{ amount }} VNĐ</span>
             </div>
         </div>
 
         <div class="btn-container">
             <a class="btn success"
                href="{{ return_url }}?vnp_ResponseCode=00&vnp_TxnRef={{ order_number }}&vnp_Amount={{ amount }}&vnp_TransactionNo=FAKE-SUCCESS-{{ order_number }}">
-               Xác nhận thanh toán thành công
+               Confirm Successful Payment!
             </a>
 
             {% comment %} <a class="btn failed"
                href="{{ return_url }}?vnp_ResponseCode=24&vnp_TxnRef={{ order_number }}&vnp_Amount={{ amount }}&vnp_TransactionNo=FAKE-FAIL-{{ order_number }}">
-               Thanh toán thất bại
+               Payment Failed
             </a> {% endcomment %}
         </div>
     </div>
