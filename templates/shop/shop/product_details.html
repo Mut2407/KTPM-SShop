@@ -318,11 +318,16 @@
 
                                                     <div class="rating-star">
                                                         <span>
-                                                            {% for i in "1 2 3 4 5".split %}
-                                                                <i class="fa fa-star{% if review.rating < i|float - 0.5 %}-o
-                                                                    {% elif review.rating < i|float %}-half-o{% endif %}">
-                                                                </i>
-                                                            {% endfor %}
+                                                            <i class="fa fa-star{% if review.rating < 0.5 %}-o
+                                                                {% elif review.rating < 1 %}-half-o{% endif %}"></i>
+                                                            <i class="fa fa-star{% if review.rating < 1.5 %}-o
+                                                                {% elif review.rating < 2 %}-half-o{% endif %}"></i>
+                                                            <i class="fa fa-star{% if review.rating < 2.5 %}-o
+                                                                {% elif review.rating < 3 %}-half-o{% endif %}"></i>
+                                                            <i class="fa fa-star{% if review.rating < 3.5 %}-o
+                                                                {% elif review.rating < 4 %}-half-o{% endif %}"></i>
+                                                            <i class="fa fa-star{% if review.rating < 4.5 %}-o
+                                                                {% elif review.rating < 5 %}-half-o{% endif %}"></i>
                                                         </span>
                                                     </div>
 
