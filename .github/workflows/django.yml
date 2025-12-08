@@ -36,19 +36,19 @@ jobs:
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test Accounts App
+      - name: Test Accounts Web
         run: python manage.py test accounts
 
-      - name: Test Shop App
+      - name: Test Shop Web
         run: python manage.py test shop
 
-      - name: Test Cart App
+      - name: Test Cart Web
         run: python manage.py test cart
 
-      - name: Test Orders App
+      - name: Test Orders Web
         run: python manage.py test orders
 
-      - name: Test Blog App
+      - name: Test Blog Web
         run: python manage.py test blog
 
 
