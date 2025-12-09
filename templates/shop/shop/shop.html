@@ -112,6 +112,7 @@
           </div>
           <div class="row">
             <div class="tab-content grid-content">
+              
               <div class="tab-pane fade in active text-center" id="grid">
                 {% for product in products %}
                 <div class="col-xs-12 col-sm-6 col-md-4">
@@ -124,7 +125,9 @@
                       <div class="pro-type">
                         <span>Discount</span>
                       </div>
-                      {% endif %} {% if product.new %}
+                      {% endif %} 
+                      
+                      {% if product.new %}
                       <div
                         style="background: #1c1427; color: #f4cca4"
                         class="pro-type"
@@ -132,6 +135,7 @@
                         <span>New</span>
                       </div>
                       {% endif %}
+                      
                       <a href="{{product.get_prodcut_details_url}}"
                         ><img
                           style="
@@ -142,16 +146,13 @@
                           src="{{product.image.url}}"
                           alt="Product Title"
                       /></a>
-                      <div class="actions-btn">
-                        <a
-                          style="margin-left: 20px"
-                          href="{% url 'cart:add_cart' product.id %}"
-                          ><i class="mdi mdi-cart"></i
-                        ></a>
-                        <a href="{{product.get_prodcut_details_url}}"
-                          ><i class="mdi mdi-eye"></i
-                        ></a>
+                      
+                      <div class="actions-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;">
+                        <a href="{{product.get_prodcut_details_url}}" style="margin: 0;">
+                            <i class="mdi mdi-eye"></i>
+                        </a>
                       </div>
+
                     </div>
                     <div class="product-dsc">
                       <p>
@@ -208,6 +209,7 @@
                 </div>
                 {% endfor %}
               </div>
+
               <div class="tab-pane fade in" id="list">
                 {% for product in products %}
                 <div class="col-xs-12">
@@ -296,15 +298,10 @@
                             <a
                               href="{{product.get_prodcut_details_url}}"
                               class="btn btn-warning"
-                              style="background: none; color: #f4cca4"
+                              style="background: none; color: #f4cca4; border: 1px solid #f4cca4;"
                               >View Details <i class="mdi mdi-eye"></i
                             ></a>
-                            <a
-                              href="{% url 'cart:add_cart' product.id %}"
-                              class="btn"
-                              style="color: #1c1427; background: #f4cca4"
-                              >add to cart <i class="mdi mdi-cart-outline"></i
-                            ></a>
+                            
                           </div>
                         </div>
                       </div>
