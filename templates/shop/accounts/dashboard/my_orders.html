@@ -3,15 +3,15 @@
 {% block title %}My Orders{% endblock title %}
 {% block content %}
 
-<div  class="pages-title section-padding">
-    <div  class="container">
-        <div  style="background:#40394a" class="row">
+<div class="pages-title section-padding">
+    <div class="container">
+        <div style="background:#40394a" class="row">
             <div class="col-xs-12">
                 <div class="pages-title-text text-center">
                     <h2 style="color:#f4cca4">My Orders</h2>
                     <ul class="text-left">
-                        <li><a style="color:#d99879" href="\">Home </a></li>
-                        <li style="color:#d99879"><span> // </span>Cart</li>
+                        <li><a style="color:#d99879" href="/">Home </a></li>
+                        <li style="color:#d99879"><span> // </span>My Orders</li>
                     </ul>
                 </div>
             </div>
@@ -34,43 +34,43 @@
           <br>
           {% if orders_count >= 1 %}
           <table class="table table-hover text-center">
-            <thead >
-              <tr >
-                <th style="background:#D99879;color:#1C1427;font-size:16px;border-radius:10px 0  0 0 ; " scope="col">Order Number</th>
-                <th style="background:#D99879;color:#1C1427;font-size:16px" scope="col">Total Price</th>
+            <thead>
+              <tr>
+                <th style="background:#D99879;color:#1C1427;font-size:16px;border-radius:10px 0 0 0;" scope="col">Order #</th>
                 <th style="background:#D99879;color:#1C1427;font-size:16px" scope="col">Date</th>
-                <th style="background:#D99879;color:#1C1427;font-size:16px; border-radius:0 10px 0 0 " scope="col"></th>
-              </tr>
+                <th style="background:#D99879;color:#1C1427;font-size:16px" scope="col">Total</th>
+                <th style="background:#D99879;color:#1C1427;font-size:16px" scope="col">Status</th>
+                <th style="background:#D99879;color:#1C1427;font-size:16px; border-radius:0 10px 0 0" scope="col">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for order in orders %}
               <tr class='hav'>
                 <th style="background:#1C1427;font-size:16px" class="text-center" scope="row">{{order.order_number}}</th>
-                <td style="background:#1C1427;font-size:16px" >${{order.order_total}}</td>
-                <td style="background:#1C1427;font-size:16px" >{{order.order_created}}</td>
-                <td style="background:#1C1427;font-size:16px"><b><a class="btn" style="background:#F4CCA4; color:#000" href='{% url "accounts:order_detail" order.order_number%}'><b>View Details</b></a></b></td>
+                <td style="background:#1C1427;font-size:16px">{{order.order_created}}</td>
+                <td style="background:#1C1427;font-size:16px">${{order.order_total}}</td>
+                
+                <td style="background:#1C1427;font-size:16px">
+                    <span class="badge" style="background-color: #f4cca4; color: #1c1427; font-size: 14px;">
+                        {{order.status}}
+                    </span>
+                </td>
+
+                <td style="background:#1C1427;font-size:16px">
+                    <b><a class="btn" style="background:#F4CCA4; color:#000" href='{% url "accounts:order_detail" order.order_number%}'><b>View Details</b></a></b>
+                </td>
               </tr>
-              
               {% endfor %}
-
             </tbody>
-
           </table>
           <br>
-          <div>
           {% endif %}
-        </article> <!-- order-group.// -->
+        </article> 
       </main>
       <br>
-    </div> <!-- row.// -->
+    </div> 
   </div>
-
 </div>
-
 <br>
 </section>
-
-
-<!-- ========================= SECTION CONTENT END// ========================= -->
 {% endblock content %}
