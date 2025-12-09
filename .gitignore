@@ -18,6 +18,10 @@ env/
 venv/
 ENV/
 
+# --- Media & Static ---
+media/
+staticfiles/
+
 # --- Testing & Coverage ---
 htmlcov/
 .tox/

@@ -5,8 +5,6 @@ from urllib.parse import urlencode, quote_plus
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,11 +16,9 @@ from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
 from shop.models import Product
 
-
 @login_required(login_url='accounts:login')
 def payment_method(request):
     return render(request, 'shop/orders/payment_method.html',)
-
 
 @login_required(login_url='accounts:login')
 def checkout(request, total=0, total_price=0, quantity=0, cart_items=None):
@@ -38,46 +34,35 @@ def checkout(request, total=0, total_price=0, quantity=0, cart_items=None):
             total_price += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
         total = total_price + 10
-
     except ObjectDoesNotExist:
         pass 
-
-    tax = round(((2 * total_price)/100), 2)
-    grand_total = total_price + tax
+    
+    tax = round(((2 * float(total_price))/100), 2)
+    grand_total = float(total_price) + tax
     handing = 15.00
-    total = float(grand_total) + handing
+    total = grand_total + handing
     
     context = {
-        'total_price': total_price,
-        'quantity': quantity,
-        'cart_items': cart_items,
-        'handing': handing,
-        'vat': tax,
-        'order_total': total,
+        'total_price': total_price, 'quantity': quantity, 'cart_items': cart_items,
+        'handing': handing, 'vat': tax, 'order_total': total,
     }
     return render(request, 'shop/orders/checkout/checkout.html', context)
-
 
 @login_required(login_url='accounts:login')
 def payment(request, total=0, quantity=0):
     current_user = request.user
     handing = 15.0
-    
     cart_items = CartItem.objects.filter(user=current_user)
-    cart_count = cart_items.count()
-    if cart_count <= 0:
-        return redirect('shop:shop')
-
-    grand_total = 0
-    tax = 0
+    if cart_items.count() <= 0: return redirect('shop:shop')
+    
+    grand_total = 0; tax = 0
     for cart_item in cart_items:
         total += (cart_item.product.price * cart_item.quantity)
-        quantity += cart_item.quantity
-    tax = round(((2 * total)/100), 2)
+    
+    total_float = float(total)
+    tax = round(((2 * total_float)/100), 2)
 
-    grand_total = total + tax
-    handing = 15.00
-    total = float(grand_total) + handing
+    final_total = total_float + tax + 15.00
     
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -93,7 +78,7 @@ def payment(request, total=0, quantity=0):
             data.state = form.cleaned_data['state']
             data.city = form.cleaned_data['city']
             data.order_note = form.cleaned_data['order_note']
-            data.order_total = total
+            data.order_total = final_total
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
@@ -114,7 +99,7 @@ def payment(request, total=0, quantity=0):
                 'cart_items': cart_items,
                 'handing': handing,
                 'vat': tax,
-                'order_total': total,
+                'order_total': final_total,
             }
             return render(request, 'shop/orders/checkout/payment.html', context)
         else:
@@ -123,10 +108,7 @@ def payment(request, total=0, quantity=0):
     else:
         return redirect('shop:shop')
 
-
-
-# LOGIN VNPAY
-
+# logic vnpay
 @login_required(login_url='accounts:login')
 def vnpay_payment(request):
     order_number = request.GET.get('order_number')
@@ -139,7 +121,7 @@ def vnpay_payment(request):
 
     amount = int(round(order.order_total * 25000 * 100))
     ipaddr = '127.0.0.1'
-    order_desc = f"Order_{order.order_number}" # không dùng dấu cách, dùng _
+    order_desc = f"Order_{order.order_number}" 
 
     input_data = {
         'vnp_Version': '2.1.0',
@@ -167,18 +149,14 @@ def vnpay_payment(request):
 
     query_string = urlencode(sorted_data, quote_via=quote_plus)
     payment_url = f"{VNP_URL}?{query_string}&vnp_SecureHash={secure_hash}"
-
     return redirect(payment_url)
-
 
 @login_required(login_url='accounts:login')
 def vnpay_return(request):
     inputData = request.GET
-    if not inputData:
-        return redirect('shop:shop')
-
+    if not inputData: return redirect('shop:shop')
+    
     VNP_HASH_SECRET = settings.VNPAY_HASH_SECRET.strip()
-
     vnp_SecureHash = inputData.get('vnp_SecureHash')
     vnp_ResponseCode = inputData.get('vnp_ResponseCode')
     vnp_TxnRef = inputData.get('vnp_TxnRef') 
@@ -188,7 +166,6 @@ def vnpay_return(request):
     for key in inputData.keys():
         if key.startswith('vnp_') and key not in ['vnp_SecureHash', 'vnp_SecureHashType']:
             data[key] = inputData[key]
-
     sorted_data = sorted(data.items())
     hash_data = '&'.join([f"{k}={v}" for k, v in sorted_data])
     
@@ -202,76 +179,88 @@ def vnpay_return(request):
         if vnp_ResponseCode == '00':
             try:
                 order = Order.objects.get(order_number=vnp_TxnRef, is_ordered=False)
-                
                 payment = Payment.objects.create(
-                    user=request.user,
-                    payment_id=vnp_TransactionNo,
-                    payment_method='VNPay',
-                    status='Completed',
-                    amount_paid=order.order_total,
+                    user=request.user, payment_id=vnp_TransactionNo, payment_method='VNPay',
+                    status='Completed', amount_paid=order.order_total,
                 )
-
                 order.payment = payment
                 order.is_ordered = True
                 order.save()
-
-                cart_items = CartItem.objects.filter(user=request.user)
-                for item in cart_items:
-                    orderproduct = OrderProduct.objects.create(
-                        order=order,
-                        payment=payment,
-                        user=request.user,
-                        product=item.product,
-                        quantity=item.quantity,
-                        product_price=item.product.price,
-                        ordered=True,
-                    )
-                    orderproduct.variations.set(item.variation.all())
-                    orderproduct.save()
-                    item.product.stock -= item.quantity
-                    item.product.save()
-
-                cart_items.delete()
-
+                
+                _move_cart_to_order(request, order, payment)
+                
                 return redirect(f'/orders/order_completed/?order_number={order.order_number}&payment_id={payment.payment_id}')
             except Order.DoesNotExist:
-                try:
-                    order = Order.objects.get(order_number=vnp_TxnRef, is_ordered=True)
-                    payment = Payment.objects.get(payment_id=vnp_TransactionNo)
-                    return redirect(f'/orders/order_completed/?order_number={order.order_number}&payment_id={payment.payment_id}')
-                except:
-                    return redirect('shop:shop')
+                return redirect('shop:shop')
         else:
             messages.error(request, 'Giao dịch không thành công.')
             return redirect('orders:checkout')
     else:
-        print(f"--- LỖI SAI CHỮ KÝ ---")
-        print(f"Hash VNPay: {vnp_SecureHash}")
-        print(f"Hash Mình : {secure_hash}")
-        messages.error(request, 'Dữ liệu không hợp lệ (Sai chữ ký).')
+        messages.error(request, 'Sai chữ ký.')
         return redirect('orders:checkout')
-    
 
+# logic cod payment
+@login_required(login_url='accounts:login')
+def cod_payment(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_number = data.get('order_number')
+            
+            order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=False)
+            
+            payment = Payment.objects.create(
+                user=request.user,
+                payment_id=f"COD-{order_number}", 
+                payment_method='COD',
+                status='Pending',
+                amount_paid=order.order_total,
+            )
+            
+            order.payment = payment
+            order.is_ordered = True
+            order.save()
+            
+            _move_cart_to_order(request, order, payment)
+            
+            redirect_url = f"/orders/order_completed/?order_number={order.order_number}&payment_id={payment.payment_id}"
+            return JsonResponse({'status': 'success', 'redirect_url': redirect_url})
+            
+        except ObjectDoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Order not found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+            
+    return redirect('orders:checkout')
+
+def _move_cart_to_order(request, order, payment):
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+        orderproduct = OrderProduct.objects.create(
+            order=order, payment=payment, user=request.user,
+            product=item.product, quantity=item.quantity,
+            product_price=item.product.price, ordered=True,
+        )
+        orderproduct.variations.set(item.variation.all())
+        orderproduct.save()
+        
+        item.product.stock -= item.quantity
+        item.product.save()
+    
+    cart_items.delete()
 
 def order_completed(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
-
     try:
         order = Order.objects.get(order_number=order_number, is_ordered=True)
         ordered_products = OrderProduct.objects.filter(order_id=order.id)
         payment = Payment.objects.get(payment_id=transID)
-
         subtotal = sum([item.product_price * item.quantity for item in ordered_products])
-
         context = {
-            'order': order,
-            'ordered_products': ordered_products,
-            'order_number': order.order_number,
-            'transID': payment.payment_id,
-            'payment': payment,
-            'subtotal': round(subtotal, 2),
+            'order': order, 'ordered_products': ordered_products, 'order_number': order.order_number,
+            'transID': payment.payment_id, 'payment': payment, 'subtotal': round(subtotal, 2),
         }
         return render(request, 'shop/orders/order_completed/order_completed.html', context)
-    except (Payment.DoesNotExist, Order.DoesNotExist):
+    except Exception:
         return redirect('shop:shop')

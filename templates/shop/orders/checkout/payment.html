@@ -8,85 +8,90 @@
     <div class="row">
       <div class="col-xs-12">
         <div class="pages-title-text text-center">
-          <h2 style="color:#f4cca4">Payment</h2>
+          <h2 style="color: #f4cca4">Payment</h2>
           <ul class="text-left">
-            <li><a style="color:#d99879" href="/">Home </a></li>
-            <li style="color:#d99879"><span> // </span>Checkout</li>
+            <li><a style="color: #d99879" href="/">Home</a></li>
+            <li style="color: #d99879"><span>//</span> Payment</li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 </div>
-<section style="margin-bottom:50px; background:#1c1427" class="pages checkout section-padding">
+
+<section class="pages checkout section-padding" style="background: #1c1427; margin-bottom: 50px">
   <div class="container">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
-        <div style="border-radius:20px;" class="padding60">
-          
+        <div class="padding60" style="border-radius: 20px">
           <div class="log-title text-center">
-            <h2><strong style="color:#d99879">Billing Address</strong></h2><br>
+            <h2><strong style="color: #d99879">Billing Address</strong></h2>
           </div>
           <div class="cart-form-text pay-details table-responsive text-center">
-            <table class="tablee" style="width:100%" >
+            <table style="width: 100%">
               <tbody>
                 <tr>
-                  <th style="font-size:15px">Name</th>
-                  <td style="font-size:15px">{{order.full_name}}</td>
+                    <th style="width: 30%;">Name</th>
+                    <td>{{order.full_name}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Email</th>
-                  <td style="font-size:15px">{{order.email}}</td>
+                    <th>Phone</th>
+                    <td>{{order.phone}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Phone Number</th>
-                  <td style="font-size:15px">{{order.phone}}</td>
+                    <th>Email</th>
+                    <td>{{order.email}}</td>
                 </tr>
                 <tr>
-                  <th style="font-size:15px">Address</th>
-                  <td style="font-size:15px">{{order.address}}</td>
-                </tr>
-                <tr>
-                  <th style="font-size:15px">City</th>
-                  <td style="font-size:15px">{{order.city}}</td>
-                </tr>
-                <tr>
-                  <th style="font-size:15px">Country</th>
-                  <td style="font-size:15px">{{order.country}}</td>
+                    <th>Address</th>
+                    <td>
+                        {{order.address}}<br>
+                        {{order.state}}, {{order.city}}<br>
+                        {{order.country}}
+                    </td>
                 </tr>
                 {% if order.order_note %}
                 <tr>
-                  <th style="font-size:15px">Order Note</th>
-                  <td style="font-size:15px">{{order.order_note}}</td>
+                    <th>Order Note</th>
+                    <td style="font-style: italic;">"{{order.order_note}}"</td>
                 </tr>
                 {% endif %}
               </tbody>
-              <br>
             </table>
-            <br><br>
-            
-            <div class="log-title text-center">
-              <h2><strong style="color:#d99879">Payment Method</strong></h2><br>
+
+            <div class="log-title text-center" style="margin-top: 40px">
+              <h2><strong style="color: #d99879">Payment Method</strong></h2>
             </div>
-            <div style="text-align: center;">
-                 <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png" height="50px" alt="VNPay Logo">
-                 <h4 style="color: #0056b3; margin-top: 10px;">VNPAY</h4>
+
+            <div style="text-align: left; margin-left: 30px; font-size: 16px; color: white;">
+              <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer;">
+                <input type="radio" name="payment_method" value="VNPAY" checked>
+                <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png" height="30px">
+                <span>Payment via VNPAY</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer;">
+                <input type="radio" name="payment_method" value="COD">
+                <i class="fa fa-money" style="font-size: 24px; color: #28a745;"></i>
+                <span>Cash on delivery (COD)</span>
+              </label>
             </div>
+
           </div>
-        </div><br>
+        </div>
       </div>
 
       <div class="col-xs-12 col-sm-6">
-        <div style="border-radius:20px" class="padding60">
+        <div class="padding60" style="border-radius: 20px">
           <div class="log-title text-center">
-            <h2><strong style="color:#d99879">Your Order</strong></h2>
-          </div><br><br>
-          <div class="cart-form-text pay-details table-responsive text-center">
-            <table style="width:100%;" >
-              <thead style="border-radius:20px ;">
-                <tr >
-                  <th style="color:#f4cca4;background:#1c1427;border-radius:20px 0 0 20px ;">Product</th>
-                  <td style="color:#f4cca4;background:#1c1427;border-radius:0 20px 20px 0 ;">Total</td>
+            <h2><strong style="color: #d99879">Your Order</strong></h2>
+          </div>
+          <div class="cart-form-text pay-details table-responsive text-center" style="margin-top: 40px">
+            <table style="width: 100%">
+              <thead>
+                <tr>
+                  <th style="color: #f4cca4; background: #1c1427;">Product</th>
+                  <th style="color: #f4cca4; background: #1c1427;">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,32 +101,18 @@
                   <td>${{cart_item.sub_total}}</td>
                 </tr>
                 {% endfor %}
-                <tr>
-                  <th>Shipping and Handing</th>
-                  <td>${{handing}}</td>
-                </tr>
-                <tr>
-                  <th>VAT</th>
-                  <td>${{vat}}</td>
-                </tr>
-                <tr style="color:#d99879; font-size: 18px;">
-                  <th>Order total</th>
-                  <td><strong>${{order_total}}</strong></td>
-                </tr>
+                <tr><th>Shipping and Handing</th><td>${{handing}}</td></tr>
+                <tr><th>Vat</th><td>${{vat}}</td></tr>
+                <tr style="color: #d99879"><th>Order Total</th><td>${{order_total}}</td></tr>
               </tbody>
             </table>
 
-            <div style="width:100%; margin-top: 30px;" class="submit-text">
-                
-                <a href="{% url 'orders:vnpay_payment' %}?order_number={{ order.order_number }}" 
-                   class="btn" 
-                   style="background: #0056b3; color: #fff; width: 100%; font-size: 18px; padding: 15px; border-radius: 8px; border: none; transition: 0.3s;">
-                   <b><i class="fa fa-credit-card"></i> Payment via VNPAY</b>
-                </a>
-                
-                <p style="color:#777; font-size:12px; margin-top:12px;">Secured by VNPAY</p>
-
+            <div class="submit-text" style="width: 100%; margin-top: 20px">
+              <button onclick="submitPayment()" class="btn" style="background: #d99879; color: #1c1427; width: 100%; font-size: 18px; font-weight: bold;">
+                 Place Order
+              </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -129,4 +120,58 @@
   </div>
 </section>
 
-{% endblock content %}
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function submitPayment() {
+    // 1. Get selected payment method
+    const methodElement = document.querySelector('input[name="payment_method"]:checked');
+    if (!methodElement) {
+      alert("Please select a payment method!");
+      return;
+    }
+    const paymentMethod = methodElement.value;
+    const orderNumber = "{{ order.order_number }}";
+
+    // 2. If VNPAY -> Redirect to Real VNPay URL
+    if (paymentMethod === "VNPAY") {
+      window.location.href = "{% url 'orders:vnpay_payment' %}?order_number=" + orderNumber;
+    } 
+    // 3. If COD -> Send AJAX request
+    else if (paymentMethod === "COD") {
+      fetch("{% url 'orders:cod_payment' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({ order_number: orderNumber }),
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          // Success -> Redirect to Order Completed page
+          window.location.href = data.redirect_url;
+        } else {
+          alert("Error: " + data.message);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  }
+</script>
+
+{% endblock %}
