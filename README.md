@@ -57,6 +57,14 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
+Lưu ý: Nếu chạy server local không thành công thì hãy migrate lại local server
+```bash
+Set-Location "Path_Folder"; python manage.py migrate
+```
+hoặc
+```bash
+python manage.py migrate
+```
 7.  go live with [localhost:8000](http://localhost:8000/)
 
  <br>
