@@ -8,7 +8,7 @@ Dự án cung cấp giải pháp bán hàng trực tuyến với các tính năn
 
 Hệ thống được thiết kế theo mô hình **MTV (Model-Template-View)**, triển khai trên môi trường Local hoặc Container với **Docker**.
 
-## ![Videos Demo dự án](https://drive.google.com/drive/folders/139UHoqzkuLbw27rJPYVnP3Rv_lzChh6_?usp=sharing)
+## [Videos Demo dự án](https://drive.google.com/drive/folders/139UHoqzkuLbw27rJPYVnP3Rv_lzChh6_?usp=sharing)
 
 ---
 
