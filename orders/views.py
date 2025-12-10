@@ -16,6 +16,30 @@ from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
 from shop.models import Product
 
+# Helpers for VNPay configuration
+def _get_vnpay_settings():
+    def _s(val):
+        return str(val).strip() if val is not None else ''
+
+    VNP_TMN_CODE = _s(getattr(settings, 'VNPAY_TMN_CODE', None))
+    VNP_HASH_SECRET = _s(getattr(settings, 'VNPAY_HASH_SECRET', None))
+    VNP_URL = _s(getattr(settings, 'VNPAY_URL', None))
+    VNP_RETURN_URL = _s(getattr(settings, 'VNPAY_RETURN_URL', None))
+
+    missing = []
+    if not VNP_TMN_CODE: missing.append('VNPAY_TMN_CODE')
+    if not VNP_HASH_SECRET: missing.append('VNPAY_HASH_SECRET')
+    if not VNP_URL: missing.append('VNPAY_URL')
+    if not VNP_RETURN_URL: missing.append('VNPAY_RETURN_URL')
+
+    return {
+        'VNP_TMN_CODE': VNP_TMN_CODE,
+        'VNP_HASH_SECRET': VNP_HASH_SECRET,
+        'VNP_URL': VNP_URL,
+        'VNP_RETURN_URL': VNP_RETURN_URL,
+        'missing': missing,
+    }
+
 # --- 1. HÀM CHECK TỒN KHO ---
 def _validate_cart_stock_or_redirect(request, cart_items):
     """Kiểm tra tồn kho lần cuối trước khi tạo đơn hàng."""
@@ -137,10 +161,15 @@ def vnpay_payment(request):
     order_number = request.GET.get('order_number')
     order = get_object_or_404(Order, user=request.user, is_ordered=False, order_number=order_number)
 
-    VNP_TMN_CODE = settings.VNPAY_TMN_CODE.strip()
-    VNP_HASH_SECRET = settings.VNPAY_HASH_SECRET.strip()
-    VNP_URL = settings.VNPAY_URL.strip()
-    VNP_RETURN_URL = settings.VNPAY_RETURN_URL.strip()
+    cfg = _get_vnpay_settings()
+    if cfg['missing']:
+        messages.error(request, f"VNPay configuration is missing: {', '.join(cfg['missing'])}.")
+        return redirect('orders:checkout')
+
+    VNP_TMN_CODE = cfg['VNP_TMN_CODE']
+    VNP_HASH_SECRET = cfg['VNP_HASH_SECRET']
+    VNP_URL = cfg['VNP_URL']
+    VNP_RETURN_URL = cfg['VNP_RETURN_URL']
 
     amount = int(round(order.order_total * 25000 * 100))
     ipaddr = '127.0.0.1'
@@ -178,8 +207,13 @@ def vnpay_payment(request):
 def vnpay_return(request):
     inputData = request.GET
     if not inputData: return redirect('shop:shop')
-    
-    VNP_HASH_SECRET = settings.VNPAY_HASH_SECRET.strip()
+
+    cfg = _get_vnpay_settings()
+    if cfg['missing']:
+        messages.error(request, 'VNPay configuration is invalid. Please try again later.')
+        return redirect('orders:checkout')
+
+    VNP_HASH_SECRET = cfg['VNP_HASH_SECRET']
     vnp_SecureHash = inputData.get('vnp_SecureHash')
     vnp_ResponseCode = inputData.get('vnp_ResponseCode')
     vnp_TxnRef = inputData.get('vnp_TxnRef') 
