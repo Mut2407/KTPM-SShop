@@ -59,11 +59,10 @@ python manage.py runserver
 
 Lưu ý: Nếu chạy server local không thành công thì hãy migrate lại local server
 ```bash
- python manage.py m
+python manage.py migrate
  ```
 
-7.  go live with [localhost:8000](http://localhost:8000/)
-
+7.  go live with [127.0.0.1::8000](http://127.0.0.1:8000/)
  <br>
 
 # To login with superuser and access admin panel
