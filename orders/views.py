@@ -208,6 +208,7 @@ def vnpay_return(request):
                 )
                 order.payment = payment
                 order.is_ordered = True
+                order.status = 'Accepted'
                 order.save()
                 
                 _move_cart_to_order(request, order, payment)
@@ -249,6 +250,7 @@ def cod_payment(request):
             
             order.payment = payment
             order.is_ordered = True
+            order.status = 'Pending'
             order.save()
             
             _move_cart_to_order(request, order, payment)
