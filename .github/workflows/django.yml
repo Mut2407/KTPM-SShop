@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # --- JOB 1: LINT (Build & Check Code Quality) ---
+  # --- JOB 1: LINT (Build & Check Code) ---
   lint:
     runs-on: ubuntu-latest
     strategy:
