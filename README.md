@@ -2,11 +2,13 @@
 
 ## 📚 Giới thiệu
 
-**Sshop** là một là một nền tảng **thương mại điện tử (E-commerce)** chuyên kinh doanh đồ thể thao, được xây dựng dựa trên **Django Framework**. 
+**Sshop** là một là một nền tảng **thương mại điện tử (E-commerce)** chuyên kinh doanh đồ thể thao, được xây dựng dựa trên **Django Framework**.
 
 Dự án cung cấp giải pháp bán hàng trực tuyến với các tính năng từ quản lý người dùng, giỏ hàng, tích hợp thanh toán trực tuyến (VNPay) và hệ thống quản trị (Admin Dashboard).
 
 Hệ thống được thiết kế theo mô hình **MTV (Model-Template-View)**, triển khai trên môi trường Local hoặc Container với **Docker**.
+
+## ![Videos Demo dự án](https://drive.google.com/drive/folders/139UHoqzkuLbw27rJPYVnP3Rv_lzChh6_?usp=sharing)
 
 ---
 
@@ -16,22 +18,23 @@ Hệ thống được thiết kế theo mô hình **MTV (Model-Template-View)**,
 
 ## Tổng quan
 
-| Category           | Tools / Frameworks                  |
-| ------------------ | ----------------------------------- |
-| **Backend**        | Python, Django                      |
-| **Frontend**       | HTML5, CSS3, Bootstrap 4, jQuery    |
-| **Database**       | SQLite (Dev), PostgreSQL (Prod)     |
-| **Payment**        | VNPay Gateway, COD                  |
-| **Infrastructure** | Docker, Docker Compose              |
-| **Templating**     | Django Templates (DTL)              |
+| Category           | Tools / Frameworks               |
+| ------------------ | -------------------------------- |
+| **Backend**        | Python, Django                   |
+| **Frontend**       | HTML5, CSS3, Bootstrap 4, jQuery |
+| **Database**       | SQLite (Dev), PostgreSQL (Prod)  |
+| **Payment**        | VNPay Gateway, COD               |
+| **Infrastructure** | Docker, Docker Compose           |
+| **Templating**     | Django Templates (DTL)           |
 
 ---
 
 ## 📁 Mục Lục
-* [Cửa hàng thể thao - Sshop](#-Cửa-hàng-thể-thao - Sshop)
-    *[]()
+
+- [Cửa hàng thể thao - Sshop](#-Cửa-hàng-thể-thao - Sshop) \*[]()
 
 ## Chức năng chính
+
 <I> User (Khách hàng)
 
 **Authentication**: Đăng ký, Đăng nhập, Xác thực Email, Quên mật khẩu.
@@ -39,7 +42,6 @@ Hệ thống được thiết kế theo mô hình **MTV (Model-Template-View)**,
 **Cart & Checkout**: Thêm vào giỏ (Ajax), Thanh toán COD hoặc VNPay.
 **Profile**: Quản lý thông tin cá nhân, Lịch sử đơn hàng, Đổi mật khẩu.
 **Interaction**: Đánh giá và bình luận sản phẩm.
-
 
 <II> Superuser (Quản trị viên)
 
@@ -75,7 +77,8 @@ python -m venv venv
 ```bash
 .\venv\Scripts\activate
 ```
---- 
+
+---
 
 ## Triển khai Local
 
@@ -86,16 +89,19 @@ pip install -r requirements.txt
 ```
 
 2. Database Migration
+
 ```bash
 python manage.py migrate
- ```
+```
 
 3. run local server to begin
+
 ```bash
 python manage.py runserver
 ```
+
 4.  go live with [127.0.0.1::8000](http://127.0.0.1:8000/)
- <br>
+    <br>
 
 # To login with superuser and access admin panel
 
@@ -114,14 +120,16 @@ python manage.py createsuperuser
 ## 🐳 Docker Setup
 
 1. Build & Run
-``bash
-docker-compose up -d --build
-```
+   ``bash
+   docker-compose up -d --build
+
+````
 
 2. Check Containers
 ```bash
 docker ps
-```
+````
+
 # Development
 
 ## CI / CD
