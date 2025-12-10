@@ -16,8 +16,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy file requirements và cài đặt
 COPY requirements.txt /app/
-# Lưu ý: File requirements.txt của bạn chưa có gunicorn.
-# Bạn cần thêm gunicorn vào requirements.txt hoặc cài trực tiếp tại đây:
+# thêm gunicorn vào requirements.txt hoặc cài trực tiếp tại đây:
 RUN pip install --upgrade pip && pip install -r requirements.txt && pip install gunicorn
 
 # Copy toàn bộ source code vào container
@@ -26,5 +25,5 @@ COPY . /app/
 # Mở port 8000
 EXPOSE 8000
 
-# Lệnh chạy server (khớp với Procfile của bạn)
+# Lệnh chạy server
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
