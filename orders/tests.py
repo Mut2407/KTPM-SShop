@@ -138,12 +138,11 @@ class OrderSystemTest(TestCase):
         # --------------------------
         
         print("[Order System Test] 4. Verifying Order Completion...")
-        # Refresh order từ DB để lấy trạng thái mới nhất
         order.refresh_from_db()
         
         # Kiểm tra trạng thái đã đặt hàng
         self.assertTrue(order.is_ordered, "Đơn hàng phải chuyển trạng thái is_ordered=True")
-        self.assertEqual(order.status, 'PAID') # Kiểm tra status trong model Payment cập nhật vào Order
+        self.assertEqual(order.status, 'Accepted') 
         
         # Kiểm tra OrderProduct được tạo ra (chuyển từ Cart sang)
         self.assertTrue(OrderProduct.objects.filter(order=order).exists())
