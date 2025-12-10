@@ -107,11 +107,10 @@ python manage.py runserver
 
 1.  run on terminal
 
+2.  create new admin user
 ```bash
 python manage.py createsuperuser
 ```
-
-2.  create new admin user
 
 3.  go to [localhost:8000/admin](http://localhost:8000/admin)
 
@@ -123,15 +122,25 @@ python manage.py createsuperuser
    ``bash
    docker-compose up -d --build
 
-````
-
 2. Check Containers
+
 ```bash
 docker ps
-````
+```
 
 # Development
 
-## CI / CD
+## Tests
 
+## ![Migrations](docs/migrations.png)
+
+## ![Tests](docs/tests1.png)
+
+## ![Tests](docs/tests2.png)
+
+---
+
+## CI / CD
 ## ![CI/CD FLow](docs/Ci-CD.png)
+
+## ![GitAction](docs/GitAction.png)
