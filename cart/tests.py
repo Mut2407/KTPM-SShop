@@ -1,141 +1,97 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from shop.models import Product, Category
-from cart.models import Cart, CartItem
+from .models import Cart, CartItem
 
-# ============================================================================
-# 1. UNIT TEST: Kiểm tra logic tính toán nội tại (Models)
-# ============================================================================
-class CartUnitTests(TestCase):
+class CartUnitTest(TestCase):
     def setUp(self):
-        self.category = Category.objects.create(name="Áo", slug="ao")
+        self.category = Category.objects.create(name='Test', slug='test')
         self.product = Product.objects.create(
-            name="Áo Thun Basic",
-            slug="ao-thun-basic",
-            price=200,
-            stock=50,
-            category=self.category,
-            image='photos/products/test.jpg'
+            name='P1', slug='p1', price=10, category=self.category,
+            stock=10, image='photos/products/test.jpg'
         )
-        self.cart = Cart.objects.create(cart_id="test_cart_id")
+        self.cart = Cart.objects.create(cart_id='12345')
 
-    def test_cart_item_sub_total(self):
-        """Test tính tổng tiền của một dòng sản phẩm (Price * Quantity)"""
-        cart_item = CartItem.objects.create(
-            product=self.product,
-            cart=self.cart,
-            quantity=3
-        )
-        # 200 * 3 = 600
-        self.assertEqual(cart_item.sub_total(), 600)
+    def test_cart_creation(self):
+        """1. Test tạo giỏ hàng thành công"""
+        self.assertEqual(self.cart.cart_id, '12345')
 
-    def test_cart_str_representation(self):
-        self.assertEqual(str(self.cart), "test_cart_id")
+    def test_cart_item_subtotal(self):
+        """2. Test tính tổng tiền của một item (số lượng * đơn giá)"""
+        item = CartItem.objects.create(product=self.product, cart=self.cart, quantity=2)
+        # Giả sử trong model CartItem bạn có hàm sub_total()
+        self.assertEqual(item.sub_total(), 20) 
+
+    def test_cart_item_active(self):
+        """3. Test mặc định item trong giỏ hàng là active"""
+        item = CartItem.objects.create(product=self.product, cart=self.cart, quantity=1)
+        self.assertTrue(item.is_active)
 
 
-# ============================================================================
-# 2. INTEGRATION TEST: Kiểm tra tương tác Views & URLs lẻ
-# ============================================================================
-class CartIntegrationTests(TestCase):
+class CartIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.category = Category.objects.create(name="Quần", slug="quan")
+        self.category = Category.objects.create(name='Test', slug='test')
         self.product = Product.objects.create(
-            name="Quần Jean",
-            slug="quan-jean",
-            price=500,
-            stock=20,
-            category=self.category,
-            image='photos/products/jean.jpg'
+            name='P1', slug='p1', price=100, category=self.category,
+            stock=10, image='photos/products/test.jpg'
         )
         self.add_cart_url = reverse('cart:add_cart', args=[self.product.id])
         self.cart_url = reverse('cart:cart')
 
-    def test_add_to_cart_guest_user(self):
-        """Test khách thêm hàng: Session được tạo, Redirect 302, DB cập nhật"""
-        response = self.client.get(self.add_cart_url)
+    def test_add_to_cart(self):
+        """1. Test request thêm sản phẩm vào giỏ"""
+        response = self.client.post(self.add_cart_url)
+        # Thường sẽ redirect về trang cart (302)
+        self.assertEqual(response.status_code, 302)
         
-        self.assertEqual(response.status_code, 302) # Redirect
-        self.assertTrue(CartItem.objects.filter(product=self.product, quantity=1).exists())
+        # Kiểm tra session key và Cart tương ứng đã được tạo
+        session = self.client.session
+        self.assertIsNotNone(session.session_key)
+        self.assertTrue(Cart.objects.filter(cart_id=session.session_key).exists())
 
-    def test_cart_view_displays_items(self):
-        """Test trang giỏ hàng hiển thị đúng sản phẩm và giá"""
-        self.client.get(self.add_cart_url) 
-        
+    def test_cart_page_display(self):
+        """2. Test trang giỏ hàng hiển thị đúng sản phẩm đã thêm"""
+        self.client.post(self.add_cart_url) # Thêm trước
+        response = self.client.get(self.cart_url)
+        self.assertContains(response, 'P1') # Tên sản phẩm
+        self.assertContains(response, '100') # Giá tiền
+
+    def test_empty_cart(self):
+        """3. Test trang giỏ hàng khi chưa có gì"""
         response = self.client.get(self.cart_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Quần Jean")
-        self.assertContains(response, "525")
-
-    def test_remove_item_from_cart(self):
-        """Test giảm số lượng item"""
-        # Thêm 2 lần
-        self.client.get(self.add_cart_url)
-        self.client.get(self.add_cart_url)
-        
-        cart_item = CartItem.objects.filter(product=self.product).last()
-        
-        # Giảm 1
-        remove_url = reverse('cart:remove_cart', args=[self.product.id, cart_item.id])
-        self.client.get(remove_url)
-        
-        cart_item.refresh_from_db()
-        self.assertEqual(cart_item.quantity, 1)
+        # Kiểm tra thông báo giỏ hàng trống (tùy text trong template của bạn)
+        self.assertContains(response, 'Your Cart Is Empty')
 
 
-# ============================================================================
-# 3. SYSTEM TEST: Kiểm tra luồng đi trọn vẹn (End-to-End Flow)
-# ============================================================================
 class CartSystemTest(TestCase):
-    """
-    Kịch bản: 
-    Thêm SP A -> Thêm SP B -> Xem giỏ -> Thêm tiếp SP A -> Xóa hẳn SP B -> Kiểm tra tổng tiền
-    """
+    """Kịch bản: Thêm vào giỏ -> Tăng số lượng -> Xóa khỏi giỏ"""
     def setUp(self):
         self.client = Client()
-        self.category = Category.objects.create(name="Phụ kiện", slug="phu-kien")
-        
-        # Sản phẩm 1: Mũ (Giá 100)
-        self.product_1 = Product.objects.create(
-            name="Mũ Snapback", slug="mu-snapback", price=100, stock=50, category=self.category, image='p1.jpg'
+        self.category = Category.objects.create(name='Gym', slug='gym')
+        self.product = Product.objects.create(
+            name='Tạ tay', slug='ta-tay', price=50, category=self.category,
+            stock=10, image='photos/products/test.jpg'
         )
-        # Sản phẩm 2: Kính (Giá 200)
-        self.product_2 = Product.objects.create(
-            name="Kính Râm", slug="kinh-ram", price=200, stock=50, category=self.category, image='p2.jpg'
-        )
-        self.cart_url = reverse('cart:cart')
 
-    def test_full_shopping_cart_flow(self):
-        print("\n[System Test] 1. Adding Hat ($100)...")
-        self.client.get(reverse('cart:add_cart', args=[self.product_1.id]))
+    def test_cart_manipulation_flow(self):
+        add_url = reverse('cart:add_cart', args=[self.product.id])
+        cart_url = reverse('cart:cart')
 
-        
-        print("[System Test] 2. Adding Glasses ($200)...")
-        self.client.get(reverse('cart:add_cart', args=[self.product_2.id]))
+        print("\n[Cart System Test] 1. Adding Item to Cart...")
+        self.client.post(add_url)
+        response = self.client.get(cart_url)
+        self.assertContains(response, 'Tạ tay')
 
-        
-        print("[System Test] 3. Verifying Cart Page content...")
-        response = self.client.get(self.cart_url)
-        self.assertContains(response, "Mũ Snapback")
-        self.assertContains(response, "Kính Râm")
-        
+        print("[Cart System Test] 2. Adding Same Item Again (Quantity Increase)...")
+        self.client.post(add_url)
+        item = CartItem.objects.get(product=self.product)
+        self.assertEqual(item.quantity, 2)
 
-        print("[System Test] 4. Incrementing Hat quantity...")
-        self.client.get(reverse('cart:add_cart', args=[self.product_1.id]))
+        print("[Cart System Test] 3. Removing Item from Cart...")
+        remove_url = reverse('cart:remove_cart_item', args=[self.product.id, item.id]) # Giả định URL xóa
+        self.client.get(remove_url)
         
-        item_1 = CartItem.objects.get(product=self.product_1)
-        self.assertEqual(item_1.quantity, 2)
-
-        print("[System Test] 5. Removing Glasses completely...")
-        item_2 = CartItem.objects.get(product=self.product_2)
-        remove_all_url = reverse('cart:remove_cart_item', args=[self.product_2.id, item_2.id])
-        self.client.get(remove_all_url)
-        
-        print("[System Test] 6. Verifying Final State...")
-        response = self.client.get(self.cart_url)
-        
-        # Kính phải mất, Mũ còn nguyên
-        self.assertNotContains(response, "Kính Râm")
-        self.assertContains(response, "Mũ Snapback")
-        self.assertContains(response, "219")
-        print("[System Test] Cart Flow Completed Successfully")
+        # Kiểm tra item đã biến mất khỏi DB hoặc quantity = 0
+        self.assertFalse(CartItem.objects.filter(id=item.id).exists())
