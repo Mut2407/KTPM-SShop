@@ -7,6 +7,9 @@ from orders.models import Order, Payment
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
 
+# ============================================================================
+# 1. UNIT TEST: 
+# ============================================================================
 class OrderUnitTest(TestCase):
     def test_order_default_status(self):
         """1. Test đơn hàng mới tạo phải có status là 'New'"""
@@ -56,7 +59,9 @@ class OrderUnitTest(TestCase):
         )
         self.assertEqual(order.full_name(), 'Nguyen Van A')
 
-
+# ============================================================================
+# 2. INTEGRATION TEST: 
+# ============================================================================
 class OrderIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -105,7 +110,9 @@ class OrderIntegrationTest(TestCase):
         # Checkout hiện cho phép truy cập kể cả khi giỏ trống
         self.assertEqual(response.status_code, 200)
 
-
+# ============================================================================
+# 3. SYSTEM TEST: 
+# ============================================================================
 class OrderSystemTest(TestCase):
     """
     Kịch bản End-to-End: 

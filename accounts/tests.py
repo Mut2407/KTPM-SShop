@@ -100,10 +100,10 @@ class AccountSystemTest(TestCase):
         """2. Kịch bản: Nhập sai mật khẩu -> Hệ thống báo lỗi"""
         response = self.client.post(self.login_url, {'email': 'sys@test.com', 'password': 'WRONG_PASSWORD'})
         self.assertEqual(response.status_code, 200) # Vẫn ở trang login
-        self.assertContains(response, 'Invalid') # Kiểm tra có thông báo lỗi
+        self.assertContains(response, 'Invalid') 
 
     def test_anonymous_access_dashboard_flow(self):
         """3. Kịch bản: Cố tình vào Dashboard khi chưa đăng nhập -> Bị đá về Login"""
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 302) # Redirect
-        self.assertIn(self.login_url, response.url) # Đích đến là trang login
+        self.assertIn(self.login_url, response.url) # trang login
