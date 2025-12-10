@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./media:/app/media
+      - ./static:/app/staticfiles
+    command: >
+      /bin/sh -c "
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn core.wsgi:application --bind 0.0.0.0:8000
+      "
