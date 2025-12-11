@@ -1,4 +1,4 @@
-# Cửa hàng thể thao - Sshop
+# Cửa hàng thể thao - Sshop.
 
 ## 📚 Giới thiệu
 
