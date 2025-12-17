@@ -8,7 +8,7 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Cài đặt các thư viện phụ thuộc hệ thống (nếu cần cho Pillow/Postgres)
+# Cài đặt các thư viện phụ thuộc hệ thống 
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
