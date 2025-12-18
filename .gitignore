@@ -50,3 +50,4 @@ dist/
 build/
 *.egg-info/# Maintenance update Dec 05 
 # Cleanup logs Dec 17 
+# Ignore temporary build artifacts 
